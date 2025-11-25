@@ -26,37 +26,58 @@ const BURGER_CHAINS = [
 ]
 
 async function searchBurgerRestaurants() {
-    const url = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json')
-    url.searchParams.append('query', 'burger restaurant in London')
-    url.searchParams.append('location', `${LONDON_CENTER.lat},${LONDON_CENTER.lng}`)
-    url.searchParams.append('radius', SEARCH_RADIUS)
-    url.searchParams.append('type', 'restaurant')
-    url.searchParams.append('key', GOOGLE_API_KEY)
+    // Using the new Places API (New) - Text Search
+    const url = 'https://places.googleapis.com/v1/places:searchText'
 
-    const response = await fetch(url)
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': GOOGLE_API_KEY,
+            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.id,places.types'
+        },
+        body: JSON.stringify({
+            textQuery: 'burger restaurant in London',
+            locationBias: {
+                circle: {
+                    center: {
+                        latitude: LONDON_CENTER.lat,
+                        longitude: LONDON_CENTER.lng
+                    },
+                    radius: SEARCH_RADIUS
+                }
+            },
+            maxResultCount: 20
+        })
+    })
+
     const data = await response.json()
 
-    if (data.status !== 'OK') {
-        throw new Error(`Google Places API error: ${data.status}`)
+    if (!response.ok) {
+        console.error('API Response:', data)
+        throw new Error(`Google Places API error: ${data.error?.message || response.statusText}`)
     }
 
-    return data.results
+    // Convert new API format to our expected format
+    return (data.places || []).map(place => ({
+        place_id: place.id,
+        name: place.displayName?.text || 'Unknown',
+        rating: place.rating,
+        user_ratings_total: place.userRatingCount,
+        formatted_address: place.formattedAddress,
+        vicinity: place.formattedAddress,
+        geometry: {
+            location: {
+                lat: place.location?.latitude,
+                lng: place.location?.longitude
+            }
+        },
+        types: place.types || []
+    }))
 }
 
-async function getPlaceDetails(placeId) {
-    const url = new URL('https://maps.googleapis.com/maps/api/place/details/json')
-    url.searchParams.append('place_id', placeId)
-    url.searchParams.append('fields', 'name,rating,user_ratings_total,formatted_address,geometry,types,vicinity')
-    url.searchParams.append('key', GOOGLE_API_KEY)
-
-    const response = await fetch(url)
-    const data = await response.json()
-
-    if (data.status === 'OK') {
-        return data.result
-    }
-    return null
-}
+// getPlaceDetails is no longer needed with the new API
+// All details are included in the search response
 
 function isChain(restaurantName) {
     return BURGER_CHAINS.some(chain =>
@@ -215,21 +236,8 @@ async function main() {
 
     console.log(`Filtered to ${burgerPlaces.length} quality burger restaurants`)
 
-    // Get detailed info for each
-    const detailedPlaces = []
-    for (const place of burgerPlaces.slice(0, 30)) { // Limit to top 30
-        const details = await getPlaceDetails(place.place_id)
-        if (details) {
-            detailedPlaces.push(details)
-        }
-        // Rate limit: wait 100ms between requests
-        await new Promise(resolve => setTimeout(resolve, 100))
-    }
-
-    console.log(`Got details for ${detailedPlaces.length} restaurants`)
-
     // Insert into Supabase
-    await insertIntoSupabase(detailedPlaces)
+    await insertIntoSupabase(burgerPlaces)
 
     console.log('✅ Done!')
 }
