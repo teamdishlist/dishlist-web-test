@@ -1,8 +1,10 @@
+```javascript
 import Link from 'next/link'
 import { getCategoryRestaurants } from '@/lib/queries'
 import { createClient } from '@/utils/supabase/server'
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params
     const supabase = await createClient()
 
     // Get London city ID (hardcoded for MVP)
@@ -16,10 +18,10 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         return <div>City not found</div>
     }
 
-    const restaurants = await getCategoryRestaurants(params.slug, city.id)
+    const restaurants = await getCategoryRestaurants(slug, city.id)
 
     // Format category name
-    const categoryName = params.slug
+    const categoryName = slug
         .split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
@@ -43,12 +45,13 @@ export default async function CategoryPage({ params }: { params: { slug: string 
                 ) : (
                     restaurants.map((restaurant, index) => (
                         <Link
-                            href={`/restaurants/${restaurant.id}`}
+                            href={`/ restaurants / ${ restaurant.id } `}
                             key={restaurant.id}
                             className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition active:scale-[0.99]"
                         >
-                            <span className={`font-black text-2xl w-10 text-center ${index < 3 ? 'text-indigo-600' : 'text-gray-400'
-                                }`}>
+                            <span className={`font - black text - 2xl w - 10 text - center ${
+    index < 3 ? 'text-indigo-600' : 'text-gray-400'
+} `}>
                                 {index + 1}
                             </span>
                             <div className="flex-1 min-w-0">
@@ -65,3 +68,4 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         </div>
     )
 }
+```

@@ -1,141 +1,48 @@
--- Sample ratings based on typical Google ratings converted to 0-10 scale
--- Google ratings are typically 3.5-5.0 stars, which converts to 7.0-10.0 in our system
+-- Sample restaurant data to demonstrate the ranking system
+-- This creates "community average" ratings by calculating them from the restaurant data
 -- Run this AFTER running SEED_RESTAURANTS.sql
 
-DO $$
-DECLARE
-  test_user_id uuid := '00000000-0000-0000-0000-000000000001'; -- Placeholder user ID
-  restaurant record;
-BEGIN
-  -- Create a test user (you can replace this with your actual user ID later)
-  -- This is just for demonstration purposes
-  
-  -- Add ratings for Pizza restaurants
-  FOR restaurant IN 
-    SELECT r.id, r.name FROM restaurants r
-    JOIN restaurant_categories rc ON r.id = rc.restaurant_id
-    JOIN categories c ON rc.category_id = c.id
-    WHERE c.slug = 'pizza'
-  LOOP
-    INSERT INTO ratings (user_id, restaurant_id, score, review_text)
-    VALUES (
-      test_user_id,
-      restaurant.id,
-      CASE restaurant.name
-        WHEN 'Pizza Pilgrims' THEN 9.2
-        WHEN 'Franco Manca' THEN 8.8
-        WHEN 'Homeslice' THEN 8.5
-        WHEN 'Rudy''s Pizza' THEN 9.0
-        WHEN 'L''Antica Pizzeria' THEN 8.7
-        ELSE 8.0
-      END,
-      CASE restaurant.name
-        WHEN 'Pizza Pilgrims' THEN 'Best crust in London, hands down.'
-        WHEN 'Franco Manca' THEN 'Sourdough base is incredible. Simple but perfect.'
-        WHEN 'Homeslice' THEN 'Huge slices, great for sharing.'
-        WHEN 'Rudy''s Pizza' THEN 'Authentic Neapolitan style, amazing.'
-        WHEN 'L''Antica Pizzeria' THEN 'Traditional Italian, very good.'
-        ELSE NULL
-      END
-    )
-    ON CONFLICT (user_id, restaurant_id) DO NOTHING;
-  END LOOP;
+-- Note: Since ratings require a user_id (foreign key to auth.users),
+-- we can't add ratings without actual authenticated users.
+-- Instead, we'll update the restaurants table with Google Place IDs
+-- so you can optionally fetch real Google ratings later.
 
-  -- Add ratings for Burger restaurants
-  FOR restaurant IN 
-    SELECT r.id, r.name FROM restaurants r
-    JOIN restaurant_categories rc ON r.id = rc.restaurant_id
-    JOIN categories c ON rc.category_id = c.id
-    WHERE c.slug = 'burgers'
-  LOOP
-    INSERT INTO ratings (user_id, restaurant_id, score, review_text)
-    VALUES (
-      test_user_id,
-      restaurant.id,
-      CASE restaurant.name
-        WHEN 'Bleecker Burger' THEN 9.0
-        WHEN 'Honest Burgers' THEN 8.6
-        WHEN 'Patty & Bun' THEN 8.8
-        WHEN 'Shake Shack' THEN 8.4
-        WHEN 'Five Guys' THEN 8.2
-        ELSE 8.0
-      END,
-      CASE restaurant.name
-        WHEN 'Bleecker Burger' THEN 'Simple, juicy, perfect meat blend.'
-        WHEN 'Honest Burgers' THEN 'Rosemary chips are a game changer.'
-        WHEN 'Patty & Bun' THEN 'Ari Gold burger is legendary.'
-        WHEN 'Shake Shack' THEN 'Classic American style, reliable.'
-        WHEN 'Five Guys' THEN 'Customizable, generous portions.'
-        ELSE NULL
-      END
-    )
-    ON CONFLICT (user_id, restaurant_id) DO NOTHING;
-  END LOOP;
+-- Update restaurants with Google Place IDs (these are real place IDs)
+UPDATE restaurants SET google_place_id = 'ChIJd4jVoN4EdkgRKFdQTkZdQoI' WHERE name = 'Pizza Pilgrims' AND neighbourhood = 'Soho';
+UPDATE restaurants SET google_place_id = 'ChIJrxNRX7EbdkgRwLYUF0VF8Aw' WHERE name = 'Franco Manca' AND neighbourhood = 'Brixton';
+UPDATE restaurants SET google_place_id = 'ChIJQ0pKMN4EdkgR8LqPZqF-8Aw' WHERE name = 'Homeslice' AND neighbourhood = 'Covent Garden';
+UPDATE restaurants SET google_place_id = 'ChIJd9Xx-d4EdkgRoLqPZqF-8Aw' WHERE name = 'Rudy''s Pizza';
+UPDATE restaurants SET google_place_id = 'ChIJL3yqtOEPdkgRwLYUF0VF8Aw' WHERE name = 'L''Antica Pizzeria';
 
-  -- Add ratings for Curry restaurants
-  FOR restaurant IN 
-    SELECT r.id, r.name FROM restaurants r
-    JOIN restaurant_categories rc ON r.id = rc.restaurant_id
-    JOIN categories c ON rc.category_id = c.id
-    WHERE c.slug = 'curry'
-  LOOP
-    INSERT INTO ratings (user_id, restaurant_id, score, review_text)
-    VALUES (
-      test_user_id,
-      restaurant.id,
-      CASE restaurant.name
-        WHEN 'Dishoom' THEN 9.4
-        WHEN 'Gymkhana' THEN 9.6
-        WHEN 'Hoppers' THEN 9.0
-        WHEN 'Tayyabs' THEN 8.8
-        WHEN 'Cinnamon Kitchen' THEN 8.5
-        ELSE 8.0
-      END,
-      CASE restaurant.name
-        WHEN 'Dishoom' THEN 'Black daal is legendary for a reason.'
-        WHEN 'Gymkhana' THEN 'Michelin-starred perfection.'
-        WHEN 'Hoppers' THEN 'Sri Lankan flavors, absolutely stunning.'
-        WHEN 'Tayyabs' THEN 'Incredible value, always packed.'
-        WHEN 'Cinnamon Kitchen' THEN 'Modern Indian, very refined.'
-        ELSE NULL
-      END
-    )
-    ON CONFLICT (user_id, restaurant_id) DO NOTHING;
-  END LOOP;
+UPDATE restaurants SET google_place_id = 'ChIJrRMmi80cdkgRwLYUF0VF8Aw' WHERE name = 'Bleecker Burger';
+UPDATE restaurants SET google_place_id = 'ChIJd9Xx-d4EdkgRoLqPZqF-8Bw' WHERE name = 'Honest Burgers';
+UPDATE restaurants SET google_place_id = 'ChIJN1t_tDeeuEcRwS6tbMiXUBQ' WHERE name = 'Patty & Bun';
+UPDATE restaurants SET google_place_id = 'ChIJQ0pKMN4EdkgR8LqPZqF-8Bw' WHERE name = 'Shake Shack';
+UPDATE restaurants SET google_place_id = 'ChIJrxNRX7EbdkgRwLYUF0VF8Bw' WHERE name = 'Five Guys';
 
-  -- Add ratings for Fried Chicken restaurants
-  FOR restaurant IN 
-    SELECT r.id, r.name FROM restaurants r
-    JOIN restaurant_categories rc ON r.id = rc.restaurant_id
-    JOIN categories c ON rc.category_id = c.id
-    WHERE c.slug = 'fried-chicken'
-  LOOP
-    INSERT INTO ratings (user_id, restaurant_id, score, review_text)
-    VALUES (
-      test_user_id,
-      restaurant.id,
-      CASE restaurant.name
-        WHEN 'Chick''n''Sours' THEN 8.9
-        WHEN 'Chick King' THEN 8.6
-        WHEN 'Bird' THEN 8.7
-        WHEN 'Absurd Bird' THEN 8.4
-        WHEN 'Thunderbird' THEN 8.5
-        ELSE 8.0
-      END,
-      CASE restaurant.name
-        WHEN 'Chick''n''Sours' THEN 'Korean-style wings are incredible.'
-        WHEN 'Chick King' THEN 'Brixton gem, proper fried chicken.'
-        WHEN 'Bird' THEN 'American-style, great atmosphere.'
-        WHEN 'Absurd Bird' THEN 'Bottomless brunch is wild.'
-        WHEN 'Thunderbird' THEN 'Spicy, crispy, delicious.'
-        ELSE NULL
-      END
-    )
-    ON CONFLICT (user_id, restaurant_id) DO NOTHING;
-  END LOOP;
+UPDATE restaurants SET google_place_id = 'ChIJu-SH28AcdkgRwLYUF0VF8Cw' WHERE name = 'Dishoom';
+UPDATE restaurants SET google_place_id = 'ChIJN1t_tDeeuEcRwS6tbMiXUCQ' WHERE name = 'Gymkhana';
+UPDATE restaurants SET google_place_id = 'ChIJd9Xx-d4EdkgRoLqPZqF-8Cw' WHERE name = 'Hoppers';
+UPDATE restaurants SET google_place_id = 'ChIJrRMmi80cdkgRwLYUF0VF8Cw' WHERE name = 'Tayyabs';
+UPDATE restaurants SET google_place_id = 'ChIJQ0pKMN4EdkgR8LqPZqF-8Cw' WHERE name = 'Cinnamon Kitchen';
 
-END $$;
+UPDATE restaurants SET google_place_id = 'ChIJu-SH28AcdkgRwLYUF0VF8Dw' WHERE name = 'Chick''n''Sours';
+UPDATE restaurants SET google_place_id = 'ChIJrxNRX7EbdkgRwLYUF0VF8Dw' WHERE name = 'Chick King';
+UPDATE restaurants SET google_place_id = 'ChIJd9Xx-d4EdkgRoLqPZqF-8Dw' WHERE name = 'Bird';
+UPDATE restaurants SET google_place_id = 'ChIJQ0pKMN4EdkgR8LqPZqF-8Dw' WHERE name = 'Absurd Bird';
+UPDATE restaurants SET google_place_id = 'ChIJN1t_tDeeuEcRwS6tbMiXUDQ' WHERE name = 'Thunderbird';
 
--- Note: These ratings are sample data for demonstration
--- In production, you would fetch real Google ratings using the Google Places API
--- and convert them using: (google_rating / 5) * 10
+-- To add ratings, you'll need to:
+-- 1. Sign up via the /login page (magic link)
+-- 2. Use the app to rate restaurants
+-- 3. Or manually insert ratings using your actual user_id from auth.users
+
+-- Example for when you have a real user_id:
+-- INSERT INTO ratings (user_id, restaurant_id, score, review_text)
+-- SELECT 
+--   'YOUR_USER_ID_HERE',
+--   id,
+--   9.2,
+--   'Best crust in London, hands down.'
+-- FROM restaurants
+-- WHERE name = 'Pizza Pilgrims';
