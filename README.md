@@ -1,134 +1,36 @@
-# Supabase Web Application
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A modern, real-time web application built with React, TypeScript, Vite, and Supabase. Features authentication, real-time data synchronization, and a beautiful dark mode UI.
+## Getting Started
 
-## ✨ Features
-
-- 🔐 **Authentication** - Email/password signup and login with Supabase Auth
-- ⚡ **Real-time Sync** - Live updates across multiple browser sessions
-- 🎨 **Premium UI** - Dark mode with glassmorphism effects and smooth animations
-- 🔒 **Row Level Security** - Secure data access with Supabase RLS policies
-- 📱 **Responsive Design** - Works beautifully on all devices
-
-## 🚀 Quick Start
-
-### 1. Install Dependencies
-
-```bash
-npm install
-```
-
-### 2. Set Up Supabase
-
-1. Create a free account at [supabase.com](https://supabase.com)
-2. Create a new project
-3. Go to **Settings → API** and copy:
-   - Project URL
-   - Anon/Public Key
-
-### 3. Configure Environment Variables
-
-Update the `.env` file with your Supabase credentials:
-
-```env
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
-```
-
-### 4. Set Up Database
-
-1. Go to your Supabase project dashboard
-2. Click **SQL Editor** in the sidebar
-3. Open the `SUPABASE_SETUP.md` file in this project
-4. Copy all the SQL commands and run them in the SQL Editor
-
-This will create the `todos` table with proper security policies and enable real-time updates.
-
-### 5. Start Development Server
+First, run the development server:
 
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-The app will be available at `http://localhost:5173`
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 📖 Usage
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-1. **Sign Up** - Create a new account with your email and password
-2. **Add Todos** - Create todo items in the dashboard
-3. **Real-time Test** - Open the app in multiple browser tabs and watch updates sync in real-time!
-4. **Toggle & Delete** - Mark todos as complete or delete them
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## 🏗️ Project Structure
+## Learn More
 
-```
-src/
-├── components/
-│   ├── Auth/
-│   │   ├── Login.tsx       # Login form
-│   │   └── Signup.tsx      # Signup form
-│   └── ProtectedRoute.tsx  # Route guard
-├── contexts/
-│   └── AuthContext.tsx     # Auth state management
-├── hooks/
-│   └── useSupabase.ts      # Custom Supabase hooks
-├── lib/
-│   └── supabase.ts         # Supabase client config
-├── pages/
-│   └── Dashboard.tsx       # Main app page
-├── App.tsx                 # Router setup
-├── main.tsx                # App entry point
-└── index.css               # Design system
-```
+To learn more about Next.js, take a look at the following resources:
 
-## 🎨 Design System
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-The app uses a custom design system with:
-- **Inter** font family from Google Fonts
-- Dark mode color palette with vibrant accent colors
-- Glassmorphism effects with backdrop blur
-- Smooth animations and transitions
-- CSS custom properties for easy theming
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## 🔧 Tech Stack
+## Deploy on Vercel
 
-- **React 18** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Supabase** - Backend as a Service
-  - PostgreSQL database
-  - Real-time subscriptions
-  - Authentication
-  - Row Level Security
-- **React Router** - Client-side routing
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## 📝 Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-## 🔒 Security
-
-- Row Level Security (RLS) ensures users can only access their own data
-- Environment variables keep sensitive credentials secure
-- Authentication tokens are managed automatically by Supabase
-
-## 🌟 Next Steps
-
-- Add more features (notes, categories, due dates)
-- Implement email confirmation
-- Add social auth providers (Google, GitHub)
-- Deploy to production (Vercel, Netlify, etc.)
-- Add offline support with service workers
-
-## 📚 Learn More
-
-- [Supabase Documentation](https://supabase.com/docs)
-- [React Documentation](https://react.dev)
-- [Vite Documentation](https://vitejs.dev)
-
----
-
-Built with ❤️ using Supabase
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
