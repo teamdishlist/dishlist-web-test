@@ -1,19 +1,8 @@
-'use client'
-
 import Link from 'next/link'
-import { useCity } from '@/contexts/CityContext'
+import { getCategories } from '@/lib/queries'
 
-const CATEGORIES = [
-    { name: 'Pizza', slug: 'pizza', emoji: '🍕' },
-    { name: 'Burgers', slug: 'burgers', emoji: '🍔' },
-    { name: 'Fried Chicken', slug: 'fried-chicken', emoji: '🍗' },
-    { name: 'Kebabs', slug: 'kebabs', emoji: '🥙' },
-    { name: 'Curry', slug: 'curry', emoji: '🍛' },
-    { name: 'Fish & Chips', slug: 'fish-and-chips', emoji: '🐟' },
-]
-
-export default function Home() {
-    const { currentCity } = useCity()
+export default async function Home() {
+    const categories = await getCategories()
 
     return (
         <div className="max-w-md mx-auto px-4 pt-6">
@@ -22,7 +11,7 @@ export default function Home() {
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">DishList</h1>
                     <button className="text-sm font-medium text-gray-500 flex items-center gap-1">
-                        {currentCity.name} ▾
+                        London ▾
                     </button>
                 </div>
                 <Link href="/my-list" className="text-sm font-medium text-indigo-600">
@@ -34,20 +23,28 @@ export default function Home() {
             <Link href={`/dishlist-100`} className="block mb-8">
                 <div className="bg-black text-white p-6 rounded-2xl shadow-lg transform transition active:scale-95">
                     <h2 className="text-3xl font-black mb-1">DishList 100</h2>
-                    <p className="text-gray-300 text-sm">The definitive top 100 for {currentCity.name}</p>
+                    <p className="text-gray-300 text-sm">The definitive top 100 for London</p>
                 </div>
             </Link>
 
             {/* Categories Grid */}
             <h3 className="text-lg font-bold mb-4">Categories</h3>
             <div className="grid grid-cols-2 gap-4 mb-8">
-                {CATEGORIES.map((cat) => (
+                {categories.map((cat) => (
                     <Link
-                        key={cat.slug}
+                        key={cat.id}
                         href={`/categories/${cat.slug}`}
                         className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2 aspect-square hover:border-indigo-100 transition active:scale-95"
                     >
-                        <span className="text-4xl">{cat.emoji}</span>
+                        <span className="text-4xl">
+                            {cat.slug === 'pizza' && '🍕'}
+                            {cat.slug === 'burgers' && '🍔'}
+                            {cat.slug === 'fried-chicken' && '🍗'}
+                            {cat.slug === 'kebabs' && '🥙'}
+                            {cat.slug === 'curry' && '🍛'}
+                            {cat.slug === 'fish-and-chips' && '🐟'}
+                            {cat.slug === 'guinness' && '🍺'}
+                        </span>
                         <span className="font-medium text-sm">{cat.name}</span>
                     </Link>
                 ))}
