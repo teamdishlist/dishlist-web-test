@@ -1,4 +1,3 @@
-```javascript
 import Link from 'next/link'
 import { getCategoryRestaurants } from '@/lib/queries'
 import { createClient } from '@/utils/supabase/server'
@@ -45,13 +44,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                 ) : (
                     restaurants.map((restaurant, index) => (
                         <Link
-                            href={`/ restaurants / ${ restaurant.id } `}
+                            href={`/restaurants/${restaurant.id}`}
                             key={restaurant.id}
                             className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition active:scale-[0.99]"
                         >
-                            <span className={`font - black text - 2xl w - 10 text - center ${
-    index < 3 ? 'text-indigo-600' : 'text-gray-400'
-} `}>
+                            <span className={`font-black text-2xl w-10 text-center ${index < 3 ? 'text-indigo-600' : 'text-gray-400'
+                                }`}>
                                 {index + 1}
                             </span>
                             <div className="flex-1 min-w-0">
@@ -68,4 +66,3 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         </div>
     )
 }
-```
