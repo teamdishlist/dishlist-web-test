@@ -80,15 +80,20 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        // Helper to normalize strings for comparison (remove spaces, special chars, lowercase)
+        const normalizeForMatching = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '')
+
         const isChain = (name: string) => {
+            const normalizedName = normalizeForMatching(name)
             return BURGER_CHAINS.some(chain =>
-                name.toLowerCase().includes(chain.toLowerCase())
+                normalizedName.includes(normalizeForMatching(chain))
             )
         }
 
         const getChainName = (name: string) => {
+            const normalizedName = normalizeForMatching(name)
             const chain = BURGER_CHAINS.find(c =>
-                name.toLowerCase().includes(c.toLowerCase())
+                normalizedName.includes(normalizeForMatching(c))
             )
             return chain || name
         }
