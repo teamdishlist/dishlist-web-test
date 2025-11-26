@@ -135,6 +135,10 @@ export async function POST(request: NextRequest) {
 
         // Insert chains as single entries with "Multiple Locations"
         for (const [chainName, locations] of Object.entries(chainGroups)) {
+            // Calculate average rating across all locations (convert from 1-5 to 0-10)
+            const avgGoogleRating = locations.reduce((sum, loc) => sum + (loc.rating || 0), 0) / locations.length
+            const convertedRating = (avgGoogleRating / 5) * 10 // Convert to 0-10 scale
+
             // Check if chain already exists
             const { data: existing } = await supabase
                 .from('restaurants')
@@ -147,7 +151,11 @@ export async function POST(request: NextRequest) {
 
             if (existing) {
                 restaurantId = existing.id
-                results.push({ name: chainName, success: true, note: 'Already exists, added locations' })
+                results.push({
+                    name: chainName,
+                    success: true,
+                    note: `Already exists, added locations (${convertedRating.toFixed(1)}/10)`
+                })
             } else {
                 const { data: restaurant, error } = await supabase
                     .from('restaurants')
@@ -178,7 +186,21 @@ export async function POST(request: NextRequest) {
                         category_id: category.id
                     })
 
-                results.push({ name: chainName, success: true, note: `${locations.length} locations` })
+                // Create a system rating based on Google average
+                await supabase
+                    .from('ratings')
+                    .insert({
+                        user_id: '00000000-0000-0000-0000-000000000000', // System user
+                        restaurant_id: restaurantId,
+                        score: convertedRating,
+                        review_text: `Average from ${locations.length} locations`
+                    })
+
+                results.push({
+                    name: chainName,
+                    success: true,
+                    note: `${locations.length} locations (${convertedRating.toFixed(1)}/10)`
+                })
             }
 
             // Store individual locations
@@ -198,6 +220,8 @@ export async function POST(request: NextRequest) {
 
         // Insert independents normally
         for (const place of independents) {
+            const convertedRating = place.rating ? (place.rating / 5) * 10 : 0
+
             const { data: restaurant, error } = await supabase
                 .from('restaurants')
                 .insert({
@@ -230,7 +254,23 @@ export async function POST(request: NextRequest) {
                     continue
                 }
 
-                results.push({ name: place.name, success: true })
+                // Create a system rating based on Google rating
+                if (place.rating) {
+                    await supabase
+                        .from('ratings')
+                        .insert({
+                            user_id: '00000000-0000-0000-0000-000000000000', // System user
+                            restaurant_id: restaurant.id,
+                            score: convertedRating,
+                            review_text: `Google rating: ${place.rating}/5`
+                        })
+                }
+
+                results.push({
+                    name: place.name,
+                    success: true,
+                    note: place.rating ? `${convertedRating.toFixed(1)}/10` : 'No rating'
+                })
             }
         }
 
