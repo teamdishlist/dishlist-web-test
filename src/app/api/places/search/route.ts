@@ -7,6 +7,15 @@ export async function GET(request: NextRequest) {
         const searchParams = request.nextUrl.searchParams
         const query = searchParams.get('query') || 'burger restaurant in London'
 
+        // Known burger chains to expand
+        const BURGER_CHAINS = [
+            'Five Guys', 'Shake Shack', 'Honest Burgers', 'Byron',
+            'Patty & Bun', 'GBK', 'Gourmet Burger Kitchen', 'MEATliquor',
+            'Bleecker', 'Black Bear Burger', 'Burger & Lobster', 'Dirty Burger',
+            'Tommi\'s Burger Joint', 'Lucky Chip', 'Haché', 'Meat Market',
+            'Dirty Bones', 'Burger & Beyond', 'Black Tap'
+        ]
+
         // First, do a text search to get place IDs
         const searchUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json')
         searchUrl.searchParams.append('query', query)
@@ -20,10 +29,41 @@ export async function GET(request: NextRequest) {
             return NextResponse.json(searchData)
         }
 
-        // Get detailed info for each place (including accurate ratings)
+        let allResults = [...searchData.results]
+        const processedChains = new Set<string>()
+
+        // Identify chains in the initial results and fetch all their locations
+        for (const place of searchData.results) {
+            const chainName = BURGER_CHAINS.find(c => place.name.toLowerCase().includes(c.toLowerCase()))
+
+            if (chainName && !processedChains.has(chainName)) {
+                processedChains.add(chainName)
+
+                // Fetch all locations for this chain
+                const chainQuery = `${chainName} locations London`
+                const chainUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json')
+                chainUrl.searchParams.append('query', chainQuery)
+                chainUrl.searchParams.append('key', GOOGLE_API_KEY!)
+
+                const chainResponse = await fetch(chainUrl.toString())
+                const chainData = await chainResponse.json()
+
+                if (chainData.status === 'OK') {
+                    allResults = [...allResults, ...chainData.results]
+                }
+
+                // Small delay to be nice to the API
+                await new Promise(resolve => setTimeout(resolve, 100))
+            }
+        }
+
+        // Deduplicate by place_id
+        const uniqueResults = Array.from(new Map(allResults.map(item => [item.place_id, item])).values())
+
+        // Get detailed info for each place (limit to 60 to avoid timeouts)
         const detailedResults = []
 
-        for (const place of searchData.results.slice(0, 30)) {
+        for (const place of uniqueResults.slice(0, 60)) {
             // Fetch detailed place info
             const detailsUrl = new URL('https://maps.googleapis.com/maps/api/place/details/json')
             detailsUrl.searchParams.append('place_id', place.place_id)
@@ -43,8 +83,8 @@ export async function GET(request: NextRequest) {
                 detailedResults.push(place)
             }
 
-            // Rate limit: 50ms between requests
-            await new Promise(resolve => setTimeout(resolve, 50))
+            // Rate limit: 20ms between requests (faster since we might have more)
+            await new Promise(resolve => setTimeout(resolve, 20))
         }
 
         return NextResponse.json({
