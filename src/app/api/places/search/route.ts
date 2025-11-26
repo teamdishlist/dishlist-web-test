@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
             // Fetch detailed place info
             const detailsUrl = new URL('https://maps.googleapis.com/maps/api/place/details/json')
             detailsUrl.searchParams.append('place_id', place.place_id)
-            detailsUrl.searchParams.append('fields', 'name,rating,user_ratings_total,formatted_address,geometry,types,vicinity')
+            detailsUrl.searchParams.append('fields', 'name,rating,user_ratings_total,formatted_address,geometry,types,vicinity,address_components')
             detailsUrl.searchParams.append('key', GOOGLE_API_KEY!)
 
             const detailsResponse = await fetch(detailsUrl.toString())
@@ -101,7 +101,8 @@ export async function GET(request: NextRequest) {
                 detailedResults.push({
                     ...place,
                     rating: detailsData.result.rating || place.rating,
-                    user_ratings_total: detailsData.result.user_ratings_total || place.user_ratings_total
+                    user_ratings_total: detailsData.result.user_ratings_total || place.user_ratings_total,
+                    address_components: detailsData.result.address_components
                 })
             } else {
                 detailedResults.push(place)
