@@ -113,30 +113,65 @@ export interface Database {
             ratings: {
                 Row: {
                     id: string
-                    user_id: string
+                    user_id: string | null
                     restaurant_id: string
                     score: number
                     review_text: string | null
+                    source: string | null
                     created_at: string
                     updated_at: string
                 }
                 Insert: {
                     id?: string
-                    user_id: string
+                    user_id?: string | null
                     restaurant_id: string
                     score: number
                     review_text?: string | null
+                    source?: string | null
                     created_at?: string
                     updated_at?: string
                 }
                 Update: {
                     id?: string
-                    user_id?: string
+                    user_id?: string | null
                     restaurant_id?: string
                     score?: number
                     review_text?: string | null
+                    source?: string | null
                     created_at?: string
                     updated_at?: string
+                }
+            }
+            restaurant_locations: {
+                Row: {
+                    id: string
+                    restaurant_id: string
+                    name: string
+                    address: string | null
+                    lat: number | null
+                    lng: number | null
+                    google_place_id: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    restaurant_id: string
+                    name: string
+                    address?: string | null
+                    lat?: number | null
+                    lng?: number | null
+                    google_place_id?: string | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    restaurant_id?: string
+                    name?: string
+                    address?: string | null
+                    lat?: number | null
+                    lng?: number | null
+                    google_place_id?: string | null
+                    created_at?: string
                 }
             }
             my_list_entries: {
