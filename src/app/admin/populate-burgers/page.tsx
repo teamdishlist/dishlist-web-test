@@ -24,17 +24,18 @@ export default function PopulateBurgers() {
         try {
             addLog('🔍 Fetching burger restaurants from Google Places...')
 
-            // Fetch from Google Places API (client-side)
-            const response = await fetch(
-                `https://maps.googleapis.com/maps/api/place/textsearch/json?query=burger+restaurant+in+London&key=${GOOGLE_API_KEY}&type=restaurant`,
-                { mode: 'cors' }
-            )
+            // Fetch from our API route (which proxies to Google)
+            const response = await fetch('/api/places/search?query=burger+restaurant+in+London')
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
 
             const data = await response.json()
+
+            if (data.error) {
+                throw new Error(data.error)
+            }
 
             if (data.status !== 'OK') {
                 throw new Error(`Google API error: ${data.status} - ${data.error_message || ''}`)
