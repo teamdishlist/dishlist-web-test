@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
             }
 
             // Create a Google-sourced rating
-            await supabase
+            const { error: ratingError } = await supabase
                 .from('ratings')
                 .insert({
                     user_id: null,
@@ -203,6 +203,11 @@ export async function POST(request: NextRequest) {
                     review_text: `Average Google rating from ${locations.length} locations`,
                     source: 'google'
                 })
+
+            if (ratingError) {
+                console.error(`Failed to insert rating for ${chainName}:`, ratingError)
+            }
+
             // Store individual locations
             for (const location of locations) {
                 await supabase
