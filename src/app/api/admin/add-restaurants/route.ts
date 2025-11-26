@@ -259,6 +259,23 @@ export async function POST(request: NextRequest) {
                     continue
                 }
 
+                // Create a Google-sourced rating
+                if (place.rating) {
+                    const { error: ratingError } = await supabase
+                        .from('ratings')
+                        .insert({
+                            user_id: null,
+                            restaurant_id: restaurant.id,
+                            score: convertedRating,
+                            review_text: `Google rating: ${place.rating}/5 stars`,
+                            source: 'google'
+                        })
+
+                    if (ratingError) {
+                        console.error(`Failed to insert rating for ${place.name}:`, ratingError)
+                    }
+                }
+
                 results.push({
                     name: place.name,
                     success: true,
