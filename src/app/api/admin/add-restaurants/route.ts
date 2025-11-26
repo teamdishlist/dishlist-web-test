@@ -186,16 +186,6 @@ export async function POST(request: NextRequest) {
                         category_id: category.id
                     })
 
-                // Create a system rating based on Google average
-                // TODO: Enable this once we have a system user or allow null user_id
-                // await supabase
-                //   .from('ratings')
-                //   .insert({
-                //     user_id: '00000000-0000-0000-0000-000000000000',
-                //     restaurant_id: restaurantId,
-                //     score: convertedRating,
-                //     review_text: `Average from ${locations.length} locations`
-                //   })
                 results.push({
                     name: chainName,
                     success: true,
@@ -254,30 +244,16 @@ export async function POST(request: NextRequest) {
                     continue
                 }
 
-                // Create a system rating based on Google rating
-                // TODO: Enable this once we have a system user or allow null user_id
-                // if (place.rating) {
-                //   await supabase
-                //     .from('ratings')
-                //     .insert({
-                //       user_id: '00000000-0000-0000-0000-000000000000',
-                //       restaurant_id: restaurant.id,
-                //       score: convertedRating,
-                //       review_text: `Google rating: ${place.rating}/5`
-                //     })
-                // }
+                results.push({
+                    name: place.name,
+                    success: true,
+                    note: place.rating ? `${convertedRating.toFixed(1)}/10` : 'No rating'
+                })
             }
-
-            results.push({
-                name: place.name,
-                success: true,
-                note: place.rating ? `${convertedRating.toFixed(1)}/10` : 'No rating'
-            })
         }
-    }
 
         return NextResponse.json({ results })
-} catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-}
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 })
+    }
 }
