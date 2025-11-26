@@ -43,8 +43,35 @@ export async function POST(request: NextRequest) {
             'Five Guys', 'Shake Shack', 'Honest Burgers', 'Byron',
             'Patty & Bun', 'GBK', 'Gourmet Burger Kitchen', 'MEATliquor',
             'Bleecker', 'Black Bear Burger', 'Burger & Lobster', 'Dirty Burger',
-            'Tommi\'s Burger Joint', 'Lucky Chip', 'Haché', 'Meat Market'
+            'Tommi\'s Burger Joint', 'Lucky Chip', 'Haché', 'Meat Market',
+            'Dirty Bones', 'Burger & Beyond', 'Black Tap'
         ]
+
+        // Parse restaurant name to extract location suffix
+        const parseRestaurantName = (fullName: string) => {
+            // Common patterns: "Restaurant - Location", "Restaurant Location", "Restaurant, Location"
+            const patterns = [
+                /^(.+?)\s*[-–—]\s*(.+)$/,  // "Dirty Bones - Soho"
+                /^(.+?),\s*(.+)$/,          // "Dirty Bones, Soho"
+                /^(.+?)\s+(Soho|Shoreditch|Covent Garden|Carnaby|Fitzrovia|Mayfair|Camden|Brixton|Clapham|Hackney|Islington|Borough|Southwark|Notting Hill|Kensington|Chelsea|Marylebone|Paddington|King's Cross|Liverpool Street|Canary Wharf|Greenwich|Richmond|Wimbledon|Hammersmith|Fulham|Battersea|Vauxhall|Waterloo|London Bridge|Tower Bridge|Spitalfields|Dalston|Peckham|Bethnal Green|Whitechapel|Victoria|Westminster|Holborn|Bloomsbury|Clerkenwell|Farringdon|Angel|Old Street|Moorgate|Bank|Monument|Barbican|St Paul's|Chancery Lane|Temple|Embankment|Charing Cross|Leicester Square|Piccadilly|Oxford Circus|Bond Street|Marble Arch|Lancaster Gate|Bayswater|Queensway|High Street Kensington|Earl's Court|South Kensington|Sloane Square|Knightsbridge|Hyde Park Corner|Green Park|St James's Park|Pimlico|Elephant & Castle|Kennington|Oval|Stockwell|Clapham North|Clapham Common|Clapham South)$/i
+            ]
+
+            for (const pattern of patterns) {
+                const match = fullName.match(pattern)
+                if (match) {
+                    return {
+                        name: match[1].trim(),
+                        location: match[2].trim()
+                    }
+                }
+            }
+
+            // No pattern matched, return as-is
+            return {
+                name: fullName,
+                location: null
+            }
+        }
 
         const isChain = (name: string) => {
             return BURGER_CHAINS.some(chain =>
@@ -64,14 +91,28 @@ export async function POST(request: NextRequest) {
         const independents: any[] = []
 
         for (const restaurant of restaurants) {
-            if (isChain(restaurant.name)) {
-                const chainName = getChainName(restaurant.name)
+            const parsed = parseRestaurantName(restaurant.name)
+            const cleanName = parsed.name
+
+            // Use parsed location if available, otherwise use provided neighbourhood
+            const location = parsed.location || restaurant.neighbourhood
+
+            if (isChain(cleanName)) {
+                const chainName = getChainName(cleanName)
                 if (!chainGroups[chainName]) {
                     chainGroups[chainName] = []
                 }
-                chainGroups[chainName].push(restaurant)
+                chainGroups[chainName].push({
+                    ...restaurant,
+                    name: cleanName,
+                    neighbourhood: location
+                })
             } else {
-                independents.push(restaurant)
+                independents.push({
+                    ...restaurant,
+                    name: cleanName,
+                    neighbourhood: location
+                })
             }
         }
 
