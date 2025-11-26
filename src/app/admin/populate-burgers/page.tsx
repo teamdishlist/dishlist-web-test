@@ -63,63 +63,54 @@ export default function PopulateBurgers() {
 
             if (!category) throw new Error('Burgers category not found')
 
+            const restaurantsToAdd = data.results
+                .slice(0, 20)
+                .filter((place: any) => place.rating && place.rating >= 3.5)
+                .map((place: any) => ({
+                    name: place.name,
+                    neighbourhood: place.vicinity?.split(',')[0] || 'London',
+                    address: place.formatted_address,
+                    lat: place.geometry?.location?.lat,
+                    lng: place.geometry?.location?.lng,
+                    google_place_id: place.place_id,
+                    rating: place.rating
+                }))
+
+            addLog(`\nPrepared ${restaurantsToAdd.length} restaurants to add...`)
+
+            // Call admin API to insert (bypasses RLS)
+            const insertResponse = await fetch('/api/admin/add-restaurants', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    restaurants: restaurantsToAdd,
+                    categorySlug: 'burgers'
+                })
+            })
+
+            const insertData = await insertResponse.json()
+
+            if (insertData.error) {
+                throw new Error(insertData.error)
+            }
+
             let inserted = 0
-            let skipped = 0
+            let failed = 0
 
-            for (const place of data.results.slice(0, 20)) {
-                addLog(`\nChecking: ${place.name} (Rating: ${place.rating || 'N/A'})`)
-
-                if (!place.rating || place.rating < 3.5) {
-                    addLog(`  ⏭️  Skipped (rating too low)`)
-                    skipped++
-                    continue
-                }
-
-                try {
-                    const { data: restaurant, error } = await supabase
-                        .from('restaurants')
-                        .insert({
-                            name: place.name,
-                            city_id: city.id,
-                            neighbourhood: place.vicinity?.split(',')[0] || 'London',
-                            address: place.formatted_address,
-                            lat: place.geometry?.location?.lat,
-                            lng: place.geometry?.location?.lng,
-                            google_place_id: place.place_id
-                        })
-                        .select()
-                        .single()
-
-                    if (error) {
-                        addLog(`  ❌ Error inserting: ${error.message}`)
-                        continue
-                    }
-
-                    if (restaurant) {
-                        const { error: linkError } = await supabase
-                            .from('restaurant_categories')
-                            .insert({
-                                restaurant_id: restaurant.id,
-                                category_id: category.id
-                            })
-
-                        if (linkError) {
-                            addLog(`  ❌ Error linking category: ${linkError.message}`)
-                            continue
-                        }
-
-                        inserted++
-                        addLog(`  ✅ Added successfully!`)
-                    }
-                } catch (err: any) {
-                    addLog(`  ❌ Exception: ${err.message}`)
+            for (const result of insertData.results) {
+                if (result.success) {
+                    addLog(`✅ ${result.name}`)
+                    inserted++
+                } else {
+                    addLog(`❌ ${result.name}: ${result.error}`)
+                    failed++
                 }
             }
 
             setCount(inserted)
             addLog(`\n📊 Summary:`)
             addLog(`   ✅ Added: ${inserted}`)
-            addLog(`   ⏭️  Skipped: ${skipped}`)
+            addLog(`   ❌ Failed: ${failed}`)
             addLog(`\n🎉 Done!`)
         } catch (error: any) {
             addLog(`❌ Error: ${error.message}`)
