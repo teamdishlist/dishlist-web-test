@@ -49,12 +49,16 @@ export async function GET(request: NextRequest) {
 
         const processedChains = new Set<string>()
 
+        // Helper to normalize strings for comparison (remove spaces, special chars, lowercase)
+        const normalizeForMatching = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '')
+
         // Identify chains in the initial results and fetch all their locations
         // We iterate through a copy to avoid issues if we modify allResults (though we append to it)
         const initialResults = [...allResults]
 
         for (const place of initialResults) {
-            const chainName = BURGER_CHAINS.find(c => place.name.toLowerCase().includes(c.toLowerCase()))
+            const normalizedPlaceName = normalizeForMatching(place.name)
+            const chainName = BURGER_CHAINS.find(c => normalizedPlaceName.includes(normalizeForMatching(c)))
 
             if (chainName && !processedChains.has(chainName)) {
                 processedChains.add(chainName)
