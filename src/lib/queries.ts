@@ -17,7 +17,67 @@ export type RestaurantWithDetails = Restaurant & {
     ratings?: Rating[]
 }
 
-// ... (keep getCategories and getCategoryRestaurants as is)
+/**
+ * Fetch all categories
+ */
+export async function getCategories(): Promise<Category[]> {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name')
+
+    if (error) throw error
+    return data || []
+}
+
+/**
+ * Fetch restaurants for a specific category, ranked by average rating
+ */
+export async function getCategoryRestaurants(
+    categorySlug: string,
+    cityId: string
+): Promise<RestaurantWithDetails[]> {
+    const supabase = await createClient()
+
+    // Get category ID
+    const { data: category } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('slug', categorySlug)
+        .single()
+
+    if (!category) return []
+
+    // Get restaurants with ratings
+    const { data: restaurants, error } = await supabase
+        .from('restaurants')
+        .select(`
+      *,
+      restaurant_categories!inner(category_id),
+      ratings(score)
+    `)
+        .eq('city_id', cityId)
+        .eq('restaurant_categories.category_id', category.id)
+
+    if (error) throw error
+    if (!restaurants) return []
+
+    // Calculate average ratings and format data
+    return restaurants.map((r: any) => {
+        const ratings = r.ratings || []
+        const avg_rating = ratings.length > 0
+            ? ratings.reduce((sum: number, rating: any) => sum + rating.score, 0) / ratings.length
+            : 0
+
+        return {
+            ...r,
+            categories: [],
+            avg_rating,
+            rating_count: ratings.length,
+        }
+    }).sort((a, b) => b.avg_rating - a.avg_rating)
+}
 
 /**
  * Fetch a single restaurant with full details
