@@ -69,6 +69,25 @@ export default function PopulateBurgers() {
                 addLog(`${idx + 1}. ${place.name} - Rating: ${place.rating || 'NO RATING'}`)
             })
 
+            // Helper to extract neighborhood from address_components
+            const extractNeighbourhood = (addressComponents: any[]) => {
+                if (!addressComponents) return 'London'
+
+                // Try to find sublocality (e.g., Soho, Shoreditch)
+                const sublocality = addressComponents.find((c: any) =>
+                    c.types.includes('sublocality') || c.types.includes('neighborhood')
+                )
+                if (sublocality) return sublocality.long_name
+
+                // Fall back to postal_town
+                const postalTown = addressComponents.find((c: any) =>
+                    c.types.includes('postal_town')
+                )
+                if (postalTown) return postalTown.long_name
+
+                return 'London'
+            }
+
             const restaurantsToAdd = data.results
                 .slice(0, 100)  // Increased from 30 to 100
                 .filter((place: any) => {
@@ -80,7 +99,7 @@ export default function PopulateBurgers() {
                 })
                 .map((place: any) => ({
                     name: place.name,
-                    neighbourhood: place.vicinity?.split(',')[0] || 'London',
+                    neighbourhood: extractNeighbourhood(place.address_components),
                     address: place.formatted_address,
                     lat: place.geometry?.location?.lat,
                     lng: place.geometry?.location?.lng,
