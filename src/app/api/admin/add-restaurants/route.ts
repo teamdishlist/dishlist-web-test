@@ -49,15 +49,18 @@ export async function POST(request: NextRequest) {
 
         // Parse restaurant name to extract location suffix
         const parseRestaurantName = (fullName: string) => {
+            // First, clean up trailing punctuation
+            let cleaned = fullName.trim().replace(/[\s\-|–—]+$/, '')
+
             // Common patterns: "Restaurant - Location", "Restaurant Location", "Restaurant, Location"
             const patterns = [
-                /^(.+?)\s*[-–—]\s*(.+)$/,  // "Dirty Bones - Soho"
+                /^(.+?)\s*[-–—|]\s*(.+)$/,  // "Dirty Bones - Soho" or "Truffle Burger |"
                 /^(.+?),\s*(.+)$/,          // "Dirty Bones, Soho"
                 /^(.+?)\s+(Soho|Shoreditch|Covent Garden|Carnaby|Fitzrovia|Mayfair|Camden|Brixton|Clapham|Hackney|Islington|Borough|Southwark|Notting Hill|Kensington|Chelsea|Marylebone|Paddington|King's Cross|Liverpool Street|Canary Wharf|Greenwich|Richmond|Wimbledon|Hammersmith|Fulham|Battersea|Vauxhall|Waterloo|London Bridge|Tower Bridge|Spitalfields|Dalston|Peckham|Bethnal Green|Whitechapel|Victoria|Westminster|Holborn|Bloomsbury|Clerkenwell|Farringdon|Angel|Old Street|Moorgate|Bank|Monument|Barbican|St Paul's|Chancery Lane|Temple|Embankment|Charing Cross|Leicester Square|Piccadilly|Oxford Circus|Bond Street|Marble Arch|Lancaster Gate|Bayswater|Queensway|High Street Kensington|Earl's Court|South Kensington|Sloane Square|Knightsbridge|Hyde Park Corner|Green Park|St James's Park|Pimlico|Elephant & Castle|Kennington|Oval|Stockwell|Clapham North|Clapham Common|Clapham South)$/i
             ]
 
             for (const pattern of patterns) {
-                const match = fullName.match(pattern)
+                const match = cleaned.match(pattern)
                 if (match) {
                     return {
                         name: match[1].trim(),
@@ -66,9 +69,9 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            // No pattern matched, return as-is
+            // No pattern matched, return cleaned name
             return {
-                name: fullName,
+                name: cleaned,
                 location: null
             }
         }
@@ -89,7 +92,16 @@ export async function POST(request: NextRequest) {
         // Group restaurants by chain
         const chainGroups: { [key: string]: any[] } = {}
         const independents: any[] = []
+        const nameCount: { [key: string]: number } = {}
 
+        // First pass: count occurrences of each name
+        for (const restaurant of restaurants) {
+            const parsed = parseRestaurantName(restaurant.name)
+            const cleanName = parsed.name
+            nameCount[cleanName] = (nameCount[cleanName] || 0) + 1
+        }
+
+        // Second pass: group by chain or duplicate names
         for (const restaurant of restaurants) {
             const parsed = parseRestaurantName(restaurant.name)
             const cleanName = parsed.name
@@ -97,7 +109,10 @@ export async function POST(request: NextRequest) {
             // Use parsed location if available, otherwise use provided neighbourhood
             const location = parsed.location || restaurant.neighbourhood
 
-            if (isChain(cleanName)) {
+            // Treat as chain if: 1) in predefined list, OR 2) appears multiple times
+            const isChainRestaurant = isChain(cleanName) || nameCount[cleanName] > 1
+
+            if (isChainRestaurant) {
                 const chainName = getChainName(cleanName)
                 if (!chainGroups[chainName]) {
                     chainGroups[chainName] = []
