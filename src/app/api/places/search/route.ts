@@ -16,24 +16,44 @@ export async function GET(request: NextRequest) {
             'Dirty Bones', 'Burger & Beyond', 'Black Tap'
         ]
 
-        // First, do a text search to get place IDs
-        const searchUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json')
-        searchUrl.searchParams.append('query', query)
-        searchUrl.searchParams.append('key', GOOGLE_API_KEY!)
-        searchUrl.searchParams.append('type', 'restaurant')
+        // First, do a text search to get place IDs (fetch up to 3 pages = 60 results)
+        let allResults: any[] = []
+        let nextPageToken = ''
 
-        const searchResponse = await fetch(searchUrl.toString())
-        const searchData = await searchResponse.json()
+        for (let i = 0; i < 3; i++) {
+            const searchUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json')
+            searchUrl.searchParams.append('query', query)
+            searchUrl.searchParams.append('key', GOOGLE_API_KEY!)
+            searchUrl.searchParams.append('type', 'restaurant')
 
-        if (searchData.status !== 'OK') {
-            return NextResponse.json(searchData)
+            if (nextPageToken) {
+                searchUrl.searchParams.append('pagetoken', nextPageToken)
+                // Wait 2 seconds for token to become valid
+                await new Promise(resolve => setTimeout(resolve, 2000))
+            }
+
+            const searchResponse = await fetch(searchUrl.toString())
+            const searchData = await searchResponse.json()
+
+            if (searchData.status !== 'OK' && searchData.status !== 'ZERO_RESULTS') {
+                break
+            }
+
+            if (searchData.results) {
+                allResults = [...allResults, ...searchData.results]
+            }
+
+            nextPageToken = searchData.next_page_token
+            if (!nextPageToken) break
         }
 
-        let allResults = [...searchData.results]
         const processedChains = new Set<string>()
 
         // Identify chains in the initial results and fetch all their locations
-        for (const place of searchData.results) {
+        // We iterate through a copy to avoid issues if we modify allResults (though we append to it)
+        const initialResults = [...allResults]
+
+        for (const place of initialResults) {
             const chainName = BURGER_CHAINS.find(c => place.name.toLowerCase().includes(c.toLowerCase()))
 
             if (chainName && !processedChains.has(chainName)) {
@@ -60,10 +80,10 @@ export async function GET(request: NextRequest) {
         // Deduplicate by place_id
         const uniqueResults = Array.from(new Map(allResults.map(item => [item.place_id, item])).values())
 
-        // Get detailed info for each place (limit to 60 to avoid timeouts)
+        // Get detailed info for each place (limit to 100 to get a good top list)
         const detailedResults = []
 
-        for (const place of uniqueResults.slice(0, 60)) {
+        for (const place of uniqueResults.slice(0, 100)) {
             // Fetch detailed place info
             const detailsUrl = new URL('https://maps.googleapis.com/maps/api/place/details/json')
             detailsUrl.searchParams.append('place_id', place.place_id)
@@ -83,12 +103,12 @@ export async function GET(request: NextRequest) {
                 detailedResults.push(place)
             }
 
-            // Rate limit: 20ms between requests (faster since we might have more)
+            // Rate limit: 20ms between requests
             await new Promise(resolve => setTimeout(resolve, 20))
         }
 
         return NextResponse.json({
-            ...searchData,
+            status: 'OK',
             results: detailedResults
         })
     } catch (error: any) {
