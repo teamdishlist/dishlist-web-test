@@ -56,14 +56,18 @@ export async function POST(request: NextRequest) {
             const patterns = [
                 /^(.+?)\s*[-–—|]\s*(.+)$/,  // "Dirty Bones - Soho" or "Truffle Burger |"
                 /^(.+?),\s*(.+)$/,          // "Dirty Bones, Soho"
-                /^(.+?)\s+(Soho|Shoreditch|Covent Garden|Carnaby|Fitzrovia|Mayfair|Camden|Brixton|Clapham|Hackney|Islington|Borough|Southwark|Notting Hill|Kensington|Chelsea|Marylebone|Paddington|King's Cross|Liverpool Street|Canary Wharf|Greenwich|Richmond|Wimbledon|Hammersmith|Fulham|Battersea|Vauxhall|Waterloo|London Bridge|Tower Bridge|Spitalfields|Dalston|Peckham|Bethnal Green|Whitechapel|Victoria|Westminster|Holborn|Bloomsbury|Clerkenwell|Farringdon|Angel|Old Street|Moorgate|Bank|Monument|Barbican|St Paul's|Chancery Lane|Temple|Embankment|Charing Cross|Leicester Square|Piccadilly|Oxford Circus|Bond Street|Marble Arch|Lancaster Gate|Bayswater|Queensway|High Street Kensington|Earl's Court|South Kensington|Sloane Square|Knightsbridge|Hyde Park Corner|Green Park|St James's Park|Pimlico|Elephant & Castle|Kennington|Oval|Stockwell|Clapham North|Clapham Common|Clapham South)$/i
+                /^(.+?)\s+(Soho|Shoreditch|Covent Garden|Carnaby|Fitzrovia|Mayfair|Camden|Brixton|Clapham|Hackney|Islington|Borough|Southwark|Notting Hill|Kensington|Chelsea|Marylebone|Paddington|King's Cross|Liverpool Street|Canary Wharf|Greenwich|Richmond|Wimbledon|Hammersmith|Fulham|Battersea|Vauxhall|Waterloo|London Bridge|Tower Bridge|Spitalfields|Dalston|Peckham|Bethnal Green|Whitechapel|Victoria|Westminster|Holborn|Bloomsbury|Clerkenwell|Farringdon|Angel|Old Street|Moorgate|Bank|Monument|Barbican|St Paul's|Chancery Lane|Temple|Embankment|Charing Cross|Leicester Square|Piccadilly|Oxford Circus|Bond Street|Marble Arch|Lancaster Gate|Bayswater|Queensway|High Street Kensington|Earl's Court|South Kensington|Sloane Square|Knightsbridge|Hyde Park Corner|Green Park|St James's Park|Pimlico|Elephant & Castle|Kennington|Oval|Stockwell|Clapham North|Clapham Common|Clapham South|Leadenhall Market)$/i
             ]
 
             for (const pattern of patterns) {
                 const match = cleaned.match(pattern)
                 if (match) {
+                    let name = match[1].trim()
+                    // Clean up common suffixes from the name part
+                    name = name.replace(/\s+(Restaurant & Bar|Restaurant|Bar & Grill|Bar)$/i, '')
+
                     return {
-                        name: match[1].trim(),
+                        name: name,
                         location: match[2].trim()
                     }
                 }
