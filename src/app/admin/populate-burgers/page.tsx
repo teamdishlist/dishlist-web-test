@@ -63,14 +63,14 @@ export default function PopulateBurgers() {
 
             if (!category) throw new Error('Burgers category not found')
 
-            // Log all restaurants with their ratings
+            // Log all restaurants from Google
             addLog(`\n📊 All restaurants from Google:`)
-            data.results.slice(0, 30).forEach((place: any, idx: number) => {
+            data.results.slice(0, 100).forEach((place: any, idx: number) => {
                 addLog(`${idx + 1}. ${place.name} - Rating: ${place.rating || 'NO RATING'}`)
             })
 
             const restaurantsToAdd = data.results
-                .slice(0, 30)  // Increased from 20 to 30
+                .slice(0, 100)  // Increased from 30 to 100
                 .filter((place: any) => {
                     const hasRating = place.rating && place.rating >= 3.5
                     if (!hasRating) {
