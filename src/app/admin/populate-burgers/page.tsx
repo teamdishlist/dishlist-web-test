@@ -92,10 +92,17 @@ export default function PopulateBurgers() {
                 .slice(0, 100)  // Increased from 30 to 100
                 .filter((place: any) => {
                     const hasRating = place.rating && place.rating >= 3.5
+                    const hasEnoughReviews = place.user_ratings_total && place.user_ratings_total >= 50
+
                     if (!hasRating) {
                         addLog(`⏭️  Skipping ${place.name} - Rating: ${place.rating || 'none'}`)
+                        return false
                     }
-                    return hasRating
+                    if (!hasEnoughReviews) {
+                        addLog(`⏭️  Skipping ${place.name} - Only ${place.user_ratings_total || 0} reviews`)
+                        return false
+                    }
+                    return true
                 })
                 .map((place: any) => ({
                     name: place.name,
