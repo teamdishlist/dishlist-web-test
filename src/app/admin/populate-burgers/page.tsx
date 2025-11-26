@@ -70,22 +70,49 @@ export default function PopulateBurgers() {
             })
 
             // Helper to extract neighborhood from address_components
-            const extractNeighbourhood = (addressComponents: any[]) => {
-                if (!addressComponents) return 'London'
+            const extractNeighbourhood = (addressComponents: any[], formattedAddress: string, vicinity: string) => {
+                // Strategy 1: Try to find sublocality or neighborhood
+                if (addressComponents) {
+                    const sublocality = addressComponents.find((c: any) =>
+                        c.types.includes('sublocality') ||
+                        c.types.includes('sublocality_level_1') ||
+                        c.types.includes('neighborhood')
+                    )
+                    if (sublocality && sublocality.long_name !== 'London') {
+                        return sublocality.long_name
+                    }
 
-                // Try to find sublocality (e.g., Soho, Shoreditch)
-                const sublocality = addressComponents.find((c: any) =>
-                    c.types.includes('sublocality') || c.types.includes('neighborhood')
-                )
-                if (sublocality) return sublocality.long_name
+                    // Strategy 2: Try locality (sometimes more specific than postal_town)
+                    const locality = addressComponents.find((c: any) =>
+                        c.types.includes('locality') && !c.types.includes('postal_town')
+                    )
+                    if (locality && locality.long_name !== 'London') {
+                        return locality.long_name
+                    }
+                }
 
-                // Fall back to postal_town
-                const postalTown = addressComponents.find((c: any) =>
-                    c.types.includes('postal_town')
-                )
-                if (postalTown) return postalTown.long_name
+                // Strategy 3: Parse from vicinity (e.g., "Soho, London")
+                if (vicinity) {
+                    const parts = vicinity.split(',').map(p => p.trim())
+                    if (parts.length > 1 && parts[0] !== 'London') {
+                        return parts[0]
+                    }
+                }
 
-                return 'London'
+                // Strategy 4: Parse from formatted address (get the area before London)
+                if (formattedAddress) {
+                    const parts = formattedAddress.split(',').map(p => p.trim())
+                    // Look for the part that comes before "London" and after the street
+                    for (let i = 1; i < parts.length - 1; i++) {
+                        const part = parts[i]
+                        // Skip postcodes and "London"
+                        if (part !== 'London' && !/^[A-Z]{1,2}\d{1,2}/.test(part)) {
+                            return part
+                        }
+                    }
+                }
+
+                return 'Central London'
             }
 
             const restaurantsToAdd = data.results
@@ -106,7 +133,7 @@ export default function PopulateBurgers() {
                 })
                 .map((place: any) => ({
                     name: place.name,
-                    neighbourhood: extractNeighbourhood(place.address_components),
+                    neighbourhood: extractNeighbourhood(place.address_components, place.formatted_address, place.vicinity),
                     address: place.formatted_address,
                     lat: place.geometry?.location?.lat,
                     lng: place.geometry?.location?.lng,
