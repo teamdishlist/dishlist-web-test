@@ -64,7 +64,7 @@ export default function PopulateBurgers() {
             if (!category) throw new Error('Burgers category not found')
 
             const restaurantsToAdd = data.results
-                .slice(0, 20)
+                .slice(0, 30)  // Increased from 20 to 30
                 .filter((place: any) => place.rating && place.rating >= 3.5)
                 .map((place: any) => ({
                     name: place.name,
