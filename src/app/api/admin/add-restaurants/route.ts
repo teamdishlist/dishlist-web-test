@@ -193,6 +193,16 @@ export async function POST(request: NextRequest) {
                 })
             }
 
+            // Create a Google-sourced rating
+            await supabase
+                .from('ratings')
+                .insert({
+                    user_id: null,
+                    restaurant_id: restaurantId,
+                    score: convertedRating,
+                    review_text: `Average Google rating from ${locations.length} locations`,
+                    source: 'google'
+                })
             // Store individual locations
             for (const location of locations) {
                 await supabase
