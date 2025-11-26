@@ -63,9 +63,21 @@ export default function PopulateBurgers() {
 
             if (!category) throw new Error('Burgers category not found')
 
+            // Log all restaurants with their ratings
+            addLog(`\n📊 All restaurants from Google:`)
+            data.results.slice(0, 30).forEach((place: any, idx: number) => {
+                addLog(`${idx + 1}. ${place.name} - Rating: ${place.rating || 'NO RATING'}`)
+            })
+
             const restaurantsToAdd = data.results
                 .slice(0, 30)  // Increased from 20 to 30
-                .filter((place: any) => place.rating && place.rating >= 3.5)
+                .filter((place: any) => {
+                    const hasRating = place.rating && place.rating >= 3.5
+                    if (!hasRating) {
+                        addLog(`⏭️  Skipping ${place.name} - Rating: ${place.rating || 'none'}`)
+                    }
+                    return hasRating
+                })
                 .map((place: any) => ({
                     name: place.name,
                     neighbourhood: place.vicinity?.split(',')[0] || 'London',
