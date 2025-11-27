@@ -24,24 +24,52 @@ export default function PopulateBurgers() {
         try {
             addLog('🔍 Fetching burger restaurants from Google Places...')
 
-            // Fetch from our API route (which proxies to Google)
-            const response = await fetch('/api/places/search?query=burger+restaurant+in+London')
+            // Search multiple areas of London for better coverage
+            const searchAreas = [
+                'Central London',
+                'East London',
+                'West London',
+                'North London',
+                'South London',
+                'Shoreditch',
+                'Soho',
+                'Camden'
+            ]
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`)
+            let allResults: any[] = []
+
+            for (const area of searchAreas) {
+                addLog(`\n📍 Searching in ${area}...`)
+
+                const response = await fetch(`/api/places/search?query=burger+restaurant+in+${encodeURIComponent(area)}`)
+
+                if (!response.ok) {
+                    addLog(`⚠️  Failed to fetch from ${area}`)
+                    continue
+                }
+
+                const data = await response.json()
+
+                if (data.error) {
+                    addLog(`⚠️  Error from ${area}: ${data.error}`)
+                    continue
+                }
+
+                if (data.status === 'OK' && data.results) {
+                    addLog(`✅ Found ${data.results.length} restaurants in ${area}`)
+                    allResults = [...allResults, ...data.results]
+                }
+
+                // Small delay between area searches
+                await new Promise(resolve => setTimeout(resolve, 500))
             }
 
-            const data = await response.json()
+            // Deduplicate by place_id
+            const uniqueResults = Array.from(
+                new Map(allResults.map(item => [item.place_id, item])).values()
+            )
 
-            if (data.error) {
-                throw new Error(data.error)
-            }
-
-            if (data.status !== 'OK') {
-                throw new Error(`Google API error: ${data.status} - ${data.error_message || ''}`)
-            }
-
-            addLog(`✅ Found ${data.results.length} restaurants`)
+            addLog(`\n📊 Total unique restaurants found: ${uniqueResults.length}`)
 
             const supabase = createClient()
 
@@ -65,7 +93,7 @@ export default function PopulateBurgers() {
 
             // Log all restaurants from Google
             addLog(`\n📊 All restaurants from Google:`)
-            data.results.slice(0, 100).forEach((place: any, idx: number) => {
+            uniqueResults.slice(0, 100).forEach((place: any, idx: number) => {
                 addLog(`${idx + 1}. ${place.name} - Rating: ${place.rating || 'NO RATING'}`)
             })
 
@@ -115,8 +143,8 @@ export default function PopulateBurgers() {
                 return 'Central London'
             }
 
-            const restaurantsToAdd = data.results
-                .slice(0, 100)  // Increased from 30 to 100
+            const restaurantsToAdd = uniqueResults
+                .slice(0, 100)  // Limit to top 100 after deduplication
                 .filter((place: any) => {
                     const hasRating = place.rating && place.rating >= 3.5
                     const hasEnoughReviews = place.user_ratings_total && place.user_ratings_total >= 50
