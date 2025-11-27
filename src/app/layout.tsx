@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Sofia_Sans } from "next/font/google";
 import "./globals.css";
 import { CityProvider } from "@/contexts/CityContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const sofiaSans = Sofia_Sans({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700", "800", "900"],
+    variable: "--font-sofia-sans"
+});
 
 export const metadata: Metadata = {
     title: "DishList - Find the best food in your city",
@@ -17,7 +21,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={inter.className}>
+            <body className={sofiaSans.className}>
                 <CityProvider>
                     <main className="min-h-screen bg-gray-50 text-gray-900 pb-20">
                         {children}

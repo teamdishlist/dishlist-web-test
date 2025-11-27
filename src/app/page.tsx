@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getCategories } from '@/lib/queries'
+import { getCategories } from '@/lib/mock-queries'
 
 export default async function Home() {
     const categories = await getCategories()

@@ -1,17 +1,26 @@
-'use client'
-
 import Link from 'next/link'
-import { useCity } from '@/contexts/CityContext'
+import { getMyList, getRestaurant } from '@/lib/mock-queries'
+import { MOCK_USER_ID, RATINGS } from '@/lib/dummy-data'
 
-// Placeholder data
-const MY_LIST_ITEMS = [
-    { id: 1, name: 'Pizza Pilgrims', category: 'Pizza', rating: 9.2, review: 'Best crust in London, hands down.', location: 'Soho' },
-    { id: 2, name: 'Bleeker Burger', category: 'Burgers', rating: 8.9, review: 'Simple, juicy, perfect meat blend.', location: 'Victoria' },
-    { id: 3, name: 'Dishoom', category: 'Curry', rating: 8.7, review: 'Black daal is legendary for a reason.', location: 'Shoreditch' },
-]
+export default async function MyList() {
+    // Get user's list
+    const myListEntries = await getMyList(MOCK_USER_ID)
 
-export default function MyList() {
-    const { currentCity } = useCity()
+    // Fetch full restaurant details with ratings for each entry
+    const myListWithDetails = await Promise.all(
+        myListEntries.map(async (entry) => {
+            const restaurant = await getRestaurant(entry.restaurant_id, MOCK_USER_ID)
+            // Get user's rating for this restaurant
+            const userRating = RATINGS.find(
+                r => r.restaurant_id === entry.restaurant_id && r.user_id === MOCK_USER_ID
+            )
+            return {
+                ...entry,
+                restaurant,
+                userRating
+            }
+        })
+    )
 
     return (
         <div className="max-w-md mx-auto px-4 pt-6 pb-20">
@@ -25,7 +34,7 @@ export default function MyList() {
                     All
                 </button>
                 <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-gray-200 transition">
-                    {currentCity.name}
+                    London
                 </button>
                 <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-gray-200 transition">
                     Highest Rated
@@ -33,23 +42,38 @@ export default function MyList() {
             </div>
 
             <div className="space-y-4">
-                {MY_LIST_ITEMS.map((item, index) => (
-                    <Link href={`/restaurants/${item.id}`} key={item.id} className="block bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition active:scale-[0.99]">
-                        <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center gap-3">
-                                <span className="font-black text-indigo-600 text-2xl w-8 text-center">#{index + 1}</span>
-                                <div>
-                                    <h3 className="font-bold text-lg leading-tight">{item.name}</h3>
-                                    <p className="text-xs text-gray-500">{item.category} • {item.location}</p>
+                {myListWithDetails.map((item, index) => {
+                    const restaurant = item.restaurant
+                    if (!restaurant) return null
+
+                    const categoryName = restaurant.categories?.[0]?.name || 'Restaurant'
+                    const rating = restaurant.avg_rating || 0
+                    const review = item.userRating?.review_text || 'No review yet'
+
+                    return (
+                        <Link
+                            href={`/restaurants/${restaurant.id}`}
+                            key={item.id}
+                            className="block bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition active:scale-[0.99]"
+                        >
+                            <div className="flex justify-between items-start mb-2">
+                                <div className="flex items-center gap-3">
+                                    <span className="font-black text-indigo-600 text-2xl w-8 text-center">#{index + 1}</span>
+                                    <div>
+                                        <h3 className="font-bold text-lg leading-tight">{restaurant.name}</h3>
+                                        <p className="text-xs text-gray-500">{categoryName} • {restaurant.neighbourhood || 'London'}</p>
+                                    </div>
+                                </div>
+                                <div className="bg-black text-white font-bold text-sm px-3 py-1.5 rounded-lg shrink-0">
+                                    {rating > 0 ? rating.toFixed(1) : '—'}
                                 </div>
                             </div>
-                            <div className="bg-black text-white font-bold text-sm px-3 py-1.5 rounded-lg shrink-0">
-                                {item.rating}
-                            </div>
-                        </div>
-                        <p className="text-gray-600 text-sm pl-11 italic">"{item.review}"</p>
-                    </Link>
-                ))}
+                            {review && (
+                                <p className="text-gray-600 text-sm pl-11 italic">"{review}"</p>
+                            )}
+                        </Link>
+                    )
+                })}
             </div>
 
             <div className="mt-8 text-center">
