@@ -98,20 +98,25 @@ export async function POST(request: NextRequest) {
             return chain || name
         }
 
+        // Deduplicate by google_place_id first
+        const uniqueRestaurants = Array.from(
+            new Map(restaurants.map((r: any) => [r.google_place_id, r])).values()
+        )
+
         // Group restaurants by chain
         const chainGroups: { [key: string]: any[] } = {}
         const independents: any[] = []
         const nameCount: { [key: string]: number } = {}
 
         // First pass: count occurrences of each name
-        for (const restaurant of restaurants) {
+        for (const restaurant of uniqueRestaurants) {
             const parsed = parseRestaurantName(restaurant.name)
             const cleanName = parsed.name
             nameCount[cleanName] = (nameCount[cleanName] || 0) + 1
         }
 
         // Second pass: group by chain or duplicate names
-        for (const restaurant of restaurants) {
+        for (const restaurant of uniqueRestaurants) {
             const parsed = parseRestaurantName(restaurant.name)
             const cleanName = parsed.name
 

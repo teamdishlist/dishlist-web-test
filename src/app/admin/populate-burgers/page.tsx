@@ -117,6 +117,14 @@ export default function PopulateBurgers() {
                     if (locality && locality.long_name !== 'London') {
                         return locality.long_name
                     }
+
+                    // Strategy 2.5: Try postal_town if it's not London
+                    const postalTown = addressComponents.find((c: any) =>
+                        c.types.includes('postal_town')
+                    )
+                    if (postalTown && postalTown.long_name !== 'London') {
+                        return postalTown.long_name
+                    }
                 }
 
                 // Strategy 3: Parse from vicinity (e.g., "Soho, London")
@@ -131,12 +139,20 @@ export default function PopulateBurgers() {
                 if (formattedAddress) {
                     const parts = formattedAddress.split(',').map(p => p.trim())
                     // Look for the part that comes before "London" and after the street
-                    for (let i = 1; i < parts.length - 1; i++) {
+                    for (let i = 1; i < parts.length; i++) {
                         const part = parts[i]
-                        // Skip postcodes and "London"
-                        if (part !== 'London' && !/^[A-Z]{1,2}\d{1,2}/.test(part)) {
+                        // Skip postcodes but accept anything else that's not "London" or "UK"
+                        if (part !== 'London' && part !== 'UK' && !/^[A-Z]{1,2}\d{1,2}/.test(part)) {
                             return part
                         }
+                    }
+                }
+
+                // Strategy 5: Extract postcode area (e.g., "N17" from "London N17 6UZ")
+                if (formattedAddress) {
+                    const postcodeMatch = formattedAddress.match(/\b([A-Z]{1,2}\d{1,2})[A-Z]?\s*\d[A-Z]{2}\b/)
+                    if (postcodeMatch) {
+                        return `London ${postcodeMatch[1]}`
                     }
                 }
 
