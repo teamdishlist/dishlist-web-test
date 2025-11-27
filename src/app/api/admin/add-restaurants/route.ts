@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Deduplicate by google_place_id first
-        const uniqueRestaurants = Array.from(
+        const uniqueRestaurants: any[] = Array.from(
             new Map(restaurants.map((r: any) => [r.google_place_id, r])).values()
         )
 
