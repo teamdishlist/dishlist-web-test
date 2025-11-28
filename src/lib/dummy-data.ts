@@ -489,11 +489,11 @@ export const RATINGS: Rating[] = [
     { id: 'rating-30', user_id: null, restaurant_id: 'porterhouse-id', score: 8.5, review_text: 'Great atmosphere, well-poured Guinness.', source: 'google', created_at: '2024-02-13T00:00:00Z', updated_at: '2024-02-13T00:00:00Z' },
 
     // User ratings (for My List)
-    { id: 'user-rating-1', user_id: MOCK_USER_ID, restaurant_id: 'pizza-pilgrims-id', score: 9.3, review_text: 'Best crust in London, hands down.', source: 'user', created_at: '2024-02-14T00:00:00Z', updated_at: '2024-02-14T00:00:00Z' },
-    { id: 'user-rating-2', user_id: MOCK_USER_ID, restaurant_id: 'bleecker-burger-id', score: 9.2, review_text: 'Simple, juicy, perfect meat blend.', source: 'user', created_at: '2024-02-15T00:00:00Z', updated_at: '2024-02-15T00:00:00Z' },
-    { id: 'user-rating-3', user_id: MOCK_USER_ID, restaurant_id: 'dishoom-id', score: 9.0, review_text: 'Black daal is legendary for a reason.', source: 'user', created_at: '2024-02-16T00:00:00Z', updated_at: '2024-02-16T00:00:00Z' },
-    { id: 'user-rating-4', user_id: MOCK_USER_ID, restaurant_id: 'gymkhana-id', score: 9.4, review_text: 'Michelin-starred perfection.', source: 'user', created_at: '2024-02-17T00:00:00Z', updated_at: '2024-02-17T00:00:00Z' },
-    { id: 'user-rating-5', user_id: MOCK_USER_ID, restaurant_id: 'chick-n-sours-id', score: 8.9, review_text: 'Korean fried chicken done right.', source: 'user', created_at: '2024-02-18T00:00:00Z', updated_at: '2024-02-18T00:00:00Z' }
+    // { id: 'user-rating-1', user_id: MOCK_USER_ID, restaurant_id: 'pizza-pilgrims-id', score: 9.3, review_text: 'Best crust in London, hands down.', source: 'user', created_at: '2024-02-14T00:00:00Z', updated_at: '2024-02-14T00:00:00Z' },
+    // { id: 'user-rating-2', user_id: MOCK_USER_ID, restaurant_id: 'bleecker-burger-id', score: 9.2, review_text: 'Simple, juicy, perfect meat blend.', source: 'user', created_at: '2024-02-15T00:00:00Z', updated_at: '2024-02-15T00:00:00Z' },
+    // { id: 'user-rating-3', user_id: MOCK_USER_ID, restaurant_id: 'dishoom-id', score: 9.0, review_text: 'Black daal is legendary for a reason.', source: 'user', created_at: '2024-02-16T00:00:00Z', updated_at: '2024-02-16T00:00:00Z' },
+    // { id: 'user-rating-4', user_id: MOCK_USER_ID, restaurant_id: 'gymkhana-id', score: 9.4, review_text: 'Michelin-starred perfection.', source: 'user', created_at: '2024-02-17T00:00:00Z', updated_at: '2024-02-17T00:00:00Z' },
+    // { id: 'user-rating-5', user_id: MOCK_USER_ID, restaurant_id: 'chick-n-sours-id', score: 8.9, review_text: 'Korean fried chicken done right.', source: 'user', created_at: '2024-02-18T00:00:00Z', updated_at: '2024-02-18T00:00:00Z' }
 ]
 
 // My List Entries

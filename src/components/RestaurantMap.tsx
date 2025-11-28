@@ -15,6 +15,7 @@ interface RestaurantMapProps {
     lat?: number | null
     lng?: number | null
     locations?: Location[]
+    className?: string
 }
 
 function MapContent({ markers }: { markers: Location[] }) {
@@ -57,7 +58,7 @@ function MapContent({ markers }: { markers: Location[] }) {
     )
 }
 
-export default function RestaurantMap({ lat, lng, locations }: RestaurantMapProps) {
+export default function RestaurantMap({ lat, lng, locations, className = "h-64 w-full" }: RestaurantMapProps) {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY
 
     if (!apiKey) return null
@@ -85,7 +86,7 @@ export default function RestaurantMap({ lat, lng, locations }: RestaurantMapProp
     }
 
     return (
-        <div className="h-64 w-full rounded-xl overflow-hidden border border-gray-100 shadow-sm relative z-0">
+        <div className={`${className} rounded-xl overflow-hidden border border-gray-100 shadow-sm relative z-0`}>
             <APIProvider apiKey={apiKey}>
                 <Map
                     defaultCenter={center}

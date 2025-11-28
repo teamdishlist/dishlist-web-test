@@ -20,8 +20,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body className={sofiaSans.className}>
+        <html lang="en" suppressHydrationWarning>
+            <body className={sofiaSans.className} suppressHydrationWarning>
                 <CityProvider>
                     <main className="min-h-screen bg-gray-50 text-gray-900 pb-20">
                         {children}
