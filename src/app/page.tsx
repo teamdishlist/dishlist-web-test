@@ -1,40 +1,52 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { getCategories } from '@/lib/mock-queries'
 
 export default async function Home() {
     const categories = await getCategories()
 
     return (
-        <div className="max-w-md mx-auto px-4 pt-6">
+        <div className="max-w-md mx-auto px-4 pt-6 min-h-screen relative">
+            {/* Background Image */}
+            <div className="fixed inset-0 -z-10">
+                <Image
+                    src="/Background.svg"
+                    alt=""
+                    fill
+                    className="object-cover"
+                    priority
+                />
+            </div>
+
             {/* Header */}
             <header className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">DishList</h1>
-                    <button className="text-sm font-medium text-gray-500 flex items-center gap-1">
+                    <h1 className="text-2xl font-bold tracking-tight text-white">DishList</h1>
+                    <button className="text-sm font-medium text-white/80 flex items-center gap-1">
                         London ▾
                     </button>
                 </div>
-                <Link href="/my-list" className="text-sm font-medium text-indigo-600">
+                <Link href="/my-list" className="text-sm font-medium text-white">
                     My List
                 </Link>
             </header>
 
             {/* DishList 100 Card */}
             <Link href={`/dishlist-100`} className="block mb-8">
-                <div className="bg-black text-white p-6 rounded-2xl shadow-lg transform transition active:scale-95">
+                <div className="bg-black text-white p-6 rounded-2xl shadow-lg transform transition active:scale-95 border border-white/10">
                     <h2 className="text-3xl font-black mb-1">DishList 100</h2>
                     <p className="text-gray-300 text-sm">The definitive top 100 for London</p>
                 </div>
             </Link>
 
             {/* Categories Grid */}
-            <h3 className="text-lg font-bold mb-4">Categories</h3>
+            <h3 className="text-lg font-bold mb-4 text-white">Categories</h3>
             <div className="grid grid-cols-2 gap-4 mb-8">
                 {categories.map((cat) => (
                     <Link
                         key={cat.id}
                         href={`/categories/${cat.slug}`}
-                        className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2 aspect-square hover:border-indigo-100 transition active:scale-95"
+                        className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-white/20 flex flex-col items-center justify-center gap-2 aspect-square hover:bg-white transition active:scale-95"
                     >
                         <span className="text-4xl">
                             {cat.slug === 'pizza' && '🍕'}
@@ -45,16 +57,16 @@ export default async function Home() {
                             {cat.slug === 'fish-and-chips' && '🐟'}
                             {cat.slug === 'guinness' && '🍺'}
                         </span>
-                        <span className="font-medium text-sm">{cat.name}</span>
+                        <span className="font-medium text-sm text-gray-900">{cat.name}</span>
                     </Link>
                 ))}
             </div>
 
             {/* Explore Teaser */}
-            <div className="bg-indigo-50 p-6 rounded-2xl mb-8 text-center">
+            <div className="bg-white/90 backdrop-blur-sm p-6 rounded-2xl mb-8 text-center border border-white/20">
                 <h3 className="font-bold text-indigo-900 mb-2">Explore Nearby</h3>
                 <p className="text-indigo-700 text-sm mb-4">Find the best food around you</p>
-                <Link href="/explore" className="inline-block bg-indigo-600 text-white px-6 py-2 rounded-full text-sm font-bold">
+                <Link href="/explore" className="inline-block bg-indigo-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg hover:bg-indigo-700 transition">
                     Open Map
                 </Link>
             </div>
