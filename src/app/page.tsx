@@ -82,7 +82,7 @@ export default async function Home() {
                     />
                     <Link
                         href="/explore"
-                        className="absolute top-3 right-3 bg-[#3F2CD1] w-8 h-8 rounded-lg flex items-center justify-center text-white shadow-md active:scale-95 transition-transform z-10"
+                        className="absolute top-3 right-3 bg-[#3F2CD1] w-10 h-10 rounded-xl flex items-center justify-center text-white hover:bg-[#3F2CD1]/90 transition active:scale-95 z-10"
                     >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M15 3L21 3L21 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -156,6 +156,81 @@ export default async function Home() {
                             </Link>
                         )
                     })}
+                </div>
+            </div>
+
+            {/* Tables Section */}
+            <div className="mb-8">
+                <h3 className="text-[16px] font-bold text-[#1E1947] mb-3">Tables</h3>
+
+                {/* DishList 100 Card */}
+                <div className="rounded-2xl overflow-hidden shadow-lg">
+                    {/* Header */}
+                    <div className="bg-[#2D2654] px-4 py-3 flex items-center justify-between">
+                        <Image
+                            src="/dishlist100.svg"
+                            alt="DishList 100"
+                            width={60}
+                            height={16}
+                            className="h-4 w-auto"
+                        />
+                        <Link
+                            href="/dishlist-100"
+                            className="bg-white/10 w-10 h-10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition active:scale-95"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 3L21 3L21 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M9 21L3 21L3 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M21 3L14 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M3 21L10 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </Link>
+                    </div>
+
+                    {/* Top 3 Restaurants */}
+                    <div className="bg-white">
+                        {categoryRestaurants[0]?.restaurants.slice(0, 3).map((restaurant, index) => (
+                            <Link
+                                key={restaurant.id}
+                                href={`/dishlist-100`}
+                                className={`flex items-center gap-2 px-4 py-3 transition active:scale-[0.99] ${index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-[#F6F2F1] hover:bg-[#F6F2F1]/80'
+                                    }`}
+                            >
+                                {/* Rank */}
+                                <span className="text-base font-bold text-gray-900 w-8">{index + 1}</span>
+
+                                {/* Food Emoji */}
+                                <span className="text-3xl">
+                                    {index === 0 && '🍕'}
+                                    {index === 1 && '🍔'}
+                                    {index === 2 && '🍛'}
+                                </span>
+
+                                {/* Restaurant Info */}
+                                <div className="flex-1">
+                                    <h4 className="font-semibold text-gray-900 text-base">{restaurant.name}</h4>
+                                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EF4444" />
+                                            <circle cx="12" cy="9" r="2.5" fill="white" />
+                                        </svg>
+                                        <span>Multiple locations</span>
+                                    </div>
+                                </div>
+
+                                {/* Rating with Trend */}
+                                <div className="flex items-center gap-2">
+                                    <span className="text-base font-bold text-gray-900">{restaurant.avg_rating.toFixed(1)}</span>
+                                    <Image
+                                        src="/rating-indicators /trend=up.svg"
+                                        alt="trending up"
+                                        width={16}
+                                        height={16}
+                                    />
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
