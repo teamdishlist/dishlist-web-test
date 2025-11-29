@@ -23,7 +23,7 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning>
             <body className={sofiaSans.className} suppressHydrationWarning>
                 <CityProvider>
-                    <main className="min-h-screen bg-gray-50 text-gray-900 pb-20">
+                    <main className="min-h-screen text-gray-900 pb-20">
                         {children}
                     </main>
                 </CityProvider>
