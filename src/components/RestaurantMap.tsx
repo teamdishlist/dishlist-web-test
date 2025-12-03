@@ -28,6 +28,8 @@ interface Location {
     lat: number
     lng: number
     address?: string
+    category?: string
+    rating?: number
 }
 
 interface RestaurantMapProps {
@@ -35,6 +37,20 @@ interface RestaurantMapProps {
     lng?: number | null
     locations?: Location[]
     className?: string
+}
+
+// Map category slugs to emoji icons
+const getCategoryEmoji = (category?: string): string => {
+    const emojiMap: Record<string, string> = {
+        'burgers': '🍔',
+        'pizza': '🍕',
+        'fried-chicken': '🍗',
+        'kebabs': '🥙',
+        'curry': '🍛',
+        'fish-and-chips': '🐟',
+        'guinness': '🍺'
+    }
+    return emojiMap[category || ''] || '🍽️'
 }
 
 export default function RestaurantMap({ lat, lng, locations, className = "h-64 w-full" }: RestaurantMapProps) {
@@ -86,15 +102,42 @@ export default function RestaurantMap({ lat, lng, locations, className = "h-64 w
             }
         })
 
-        // Add markers
+        // Add custom markers
         markersData.forEach((location) => {
-            const marker = new maptilersdk.Marker({ color: '#4F46E5' })
+            // Create custom marker element
+            const markerEl = document.createElement('div')
+            markerEl.className = 'custom-map-marker'
+
+            const emoji = getCategoryEmoji(location.category)
+            const rating = location.rating ? location.rating.toFixed(1) : '—'
+
+            markerEl.innerHTML = `
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    background: white;
+                    padding: 6px 10px;
+                    border-radius: 20px;
+                    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+                    font-family: 'Sofia Sans', sans-serif;
+                    font-weight: 700;
+                    font-size: 16px;
+                    white-space: nowrap;
+                    cursor: pointer;
+                ">
+                    <span style="font-size: 20px;">${emoji}</span>
+                    <span style="color: #180400;">${rating}</span>
+                </div>
+            `
+
+            const marker = new maptilersdk.Marker({ element: markerEl, anchor: 'bottom' })
                 .setLngLat([location.lng, location.lat])
                 .addTo(map.current!)
 
             if (location.name) {
                 marker.setPopup(
-                    new maptilersdk.Popup().setHTML(`<strong>${location.name}</strong>`)
+                    new maptilersdk.Popup({ offset: 25 }).setHTML(`<strong>${location.name}</strong>`)
                 )
             }
 
