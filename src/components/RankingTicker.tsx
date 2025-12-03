@@ -51,9 +51,9 @@ export default function RankingTicker({ restaurants }: RankingTickerProps) {
     })
 
     return (
-        <div className="bg-white px-3 py-2 overflow-hidden relative">
+        <div className="bg-white py-2 overflow-hidden relative">
             <div className="ticker-wrapper">
-                <div className="ticker-content text-xs text-[#3D0900]">
+                <div className="ticker-content text-[14px] text-[#3D0900]">
                     {tickerContent}
                     {/* Duplicate for seamless loop */}
                     {tickerContent}

@@ -2,6 +2,7 @@ import { getCategoryRestaurants, getRestaurant } from '@/lib/mock-queries'
 import { CATEGORIES, MOCK_USER_ID } from '@/lib/dummy-data'
 import Link from 'next/link'
 import Image from 'next/image'
+import Header from '@/components/Header'
 
 export default async function DishList100Page() {
     // Fetch restaurants from all categories
@@ -30,22 +31,10 @@ export default async function DishList100Page() {
 
     return (
         <div className="max-w-md mx-auto min-h-screen" style={{ background: '#1E1947' }}>
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3" style={{ background: '#1E1947', height: '56px' }}>
-                <Link href="/" className="text-white">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                </Link>
-                <Image
-                    src="/dishlist100.svg"
-                    alt="DishList 100"
-                    width={161}
-                    height={24}
-                    priority
-                />
-                <div className="w-6" /> {/* Spacer */}
-            </div>
+            <Header />
+
+            {/* Spacer for header overlap if needed, or just let it flow */}
+            {/* The header has rounded corners at the bottom, so we might need to adjust the background color of the page or the container below */}
 
             {/* Table Container */}
             <div className="rounded-t-3xl overflow-hidden" style={{ background: '#FFFFFF' }}>
