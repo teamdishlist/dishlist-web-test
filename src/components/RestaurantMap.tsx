@@ -85,14 +85,24 @@ export default function RestaurantMap({ lat, lng, locations, className = "h-64 w
 
         // Initialize map
         maptilersdk.config.apiKey = apiKey
+        // Initialize map with geolocation enabled
         map.current = new maptilersdk.Map({
             container: mapContainer.current,
             style: `https://api.maptiler.com/maps/019ae50c-1d54-76de-883f-791cbb44fd8b/style.json?key=${apiKey}`,
             center: center,
             zoom: 13,
             navigationControl: false,
-            geolocateControl: false,
+            // Enable built‑in geolocate control
+            geolocateControl: true,
         })
+        // Add a custom GeolocateControl for better UX (shows user location & tracks)
+        const geolocate = new maptilersdk.GeolocateControl({
+            // position removed; defaults to top-right
+            showUserLocation: true,
+            trackUserLocation: true,
+            fitBoundsOptions: { maxZoom: 15 },
+        })
+        map.current.addControl(geolocate)
 
         // Hide MapTiler logo
         map.current.on('load', () => {
