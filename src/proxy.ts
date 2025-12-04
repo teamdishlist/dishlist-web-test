@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 // TEMPORARY: Middleware disabled for prototype testing with dummy data
 // Re-enable this when switching back to real database
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     // return await updateSession(request)
     return NextResponse.next()
 }
