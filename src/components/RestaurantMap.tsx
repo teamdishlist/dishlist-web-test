@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import * as maptilersdk from '@maptiler/sdk'
 import '@maptiler/sdk/dist/maptiler-sdk.css'
 
@@ -54,9 +55,11 @@ const getCategoryEmoji = (category?: string): string => {
 }
 
 export default function RestaurantMap({ lat, lng, locations, className = "h-64 w-full" }: RestaurantMapProps) {
+    const router = useRouter()
     const mapContainer = useRef<HTMLDivElement>(null)
     const map = useRef<maptilersdk.Map | null>(null)
     const markers = useRef<maptilersdk.Marker[]>([])
+    const isDragging = useRef(false)
 
     useEffect(() => {
         if (!mapContainer.current) return
@@ -94,6 +97,37 @@ export default function RestaurantMap({ lat, lng, locations, className = "h-64 w
             navigationControl: false,
             // Enable built‑in geolocate control
             geolocateControl: true,
+        })
+
+        // Track clicking to navigate to map page
+        let clickStartTime = 0
+        let clickStartPos: { x: number; y: number } | null = null
+        
+        map.current.on('click', (e) => {
+            // Only navigate if it's a quick click (not a drag)
+            const clickDuration = Date.now() - clickStartTime
+            if (clickDuration < 300 && clickStartPos) {
+                const distance = Math.sqrt(
+                    Math.pow(e.point.x - clickStartPos.x, 2) + 
+                    Math.pow(e.point.y - clickStartPos.y, 2)
+                )
+                // If moved less than 5 pixels, treat as click
+                if (distance < 5) {
+                    router.push('/map')
+                }
+            }
+        })
+        
+        map.current.on('mousedown', (e) => {
+            clickStartTime = Date.now()
+            clickStartPos = { x: e.point.x, y: e.point.y }
+        })
+        
+        map.current.on('touchstart', (e) => {
+            clickStartTime = Date.now()
+            if (e.point) {
+                clickStartPos = { x: e.point.x, y: e.point.y }
+            }
         })
         // Add a custom GeolocateControl for better UX (shows user location & tracks)
         const geolocate = new maptilersdk.GeolocateControl({
@@ -134,7 +168,6 @@ export default function RestaurantMap({ lat, lng, locations, className = "h-64 w
                     font-weight: 700;
                     font-size: 16px;
                     white-space: nowrap;
-                    cursor: pointer;
                 ">
                     <span style="font-size: 20px;">${emoji}</span>
                     <span style="color: #180400;">${rating}</span>

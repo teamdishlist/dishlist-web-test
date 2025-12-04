@@ -47,16 +47,15 @@ export default async function Home() {
 
             <Header />
 
-            <div className="px-4 pt-6">
-                {/* Welcome Section */}
-                <div className="flex justify-center items-center gap-2 mb-6">
+            {/* Welcome Section */}
+                <div className="px-4 pt-6 flex justify-center items-center gap-2 mb-6">
                     <span className="text-[#180400] text-base font-medium">Welcome to</span>
                     <CitySelector />
                 </div>
 
                 {/* My DishList Banner (Empty State) */}
                 {!hasRatings && (
-                    <div className="mb-8">
+                    <div className="px-4 mb-8">
                         <Image
                             src="/mydishlistbanner.svg"
                             alt="Start rating to build your DishList"
@@ -69,7 +68,7 @@ export default async function Home() {
                 )}
 
                 {/* Nearby Section */}
-                <div className="mb-8">
+                <div className="px-4 mb-8">
                     <h3 className="text-[16px] font-bold text-[#1E1947] mb-3">Nearby</h3>
                     <div className="relative">
                         <RestaurantMap
@@ -77,10 +76,10 @@ export default async function Home() {
                             className="h-40 w-full"
                         />
                         <Link
-                            href="/explore"
-                            className="absolute top-3 right-3 bg-[#3F2CD1] w-10 h-10 rounded-xl flex items-center justify-center text-white hover:bg-[#3F2CD1]/90 transition active:scale-95 z-10"
+                            href="/map"
+                            className="absolute top-3 right-3 bg-[#3F2CD1] w-10 h-10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition active:scale-95 z-10"
                         >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M15 3L21 3L21 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 <path d="M9 21L3 21L3 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 <path d="M21 3L14 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -92,7 +91,7 @@ export default async function Home() {
 
 
                 {/* Explore Section */}
-                <div className="mb-8">
+                <div className="px-4 mb-8">
                     <h3 className="text-[16px] font-bold text-[#1E1947] mb-3">Explore</h3>
                     <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                         {categoryRestaurants.map(({ category: cat, restaurants }) => {
@@ -156,7 +155,7 @@ export default async function Home() {
                 </div>
 
                 {/* Tables Section */}
-                <div className="mb-8">
+                <div className="px-4 mb-8">
                     <h3 className="text-[16px] font-bold text-[#1E1947] mb-3">Tables</h3>
 
                     {/* DishList 100 Card */}
@@ -229,7 +228,6 @@ export default async function Home() {
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     )
 }

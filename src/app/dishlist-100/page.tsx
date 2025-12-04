@@ -29,6 +29,13 @@ export default async function DishList100Page() {
         topRestaurants.map(r => getRestaurant(r.id, MOCK_USER_ID))
     ).then(restaurants => restaurants.filter(r => r !== null))
 
+    // Simulate trend based on position - in real app this would come from historical ranking data
+    // Using a pattern that creates variety: up, same, down, up, same, down, etc.
+    const getTrend = (index: number): 'up' | 'down' | 'same' => {
+        const pattern = ['up', 'same', 'down', 'up', 'same', 'down', 'same', 'up']
+        return pattern[index % pattern.length] as 'up' | 'down' | 'same'
+    }
+
     return (
         <div className="max-w-md mx-auto min-h-screen" style={{ background: '#1E1947' }}>
             <Header />
@@ -37,12 +44,7 @@ export default async function DishList100Page() {
             {/* The header has rounded corners at the bottom, so we might need to adjust the background color of the page or the container below */}
 
             {/* Table Container */}
-            <div className="rounded-t-3xl overflow-hidden" style={{ background: '#FFFFFF' }}>
-                {/* Drag Handle */}
-                <div className="flex justify-center py-2" style={{ background: '#FFFFFF' }}>
-                    <div className="w-14 h-1 rounded-full" style={{ background: '#E3DAD9' }}></div>
-                </div>
-
+            <div className="overflow-hidden" style={{ background: '#FFFFFF' }}>
                 {/* Table Items */}
                 <div>
                     {validRestaurants.map((restaurant, index) => (
@@ -156,7 +158,7 @@ export default async function DishList100Page() {
                                 )}
 
                                 {/* Average Rating with Trend Indicator */}
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1.5">
                                     <span
                                         className="font-bold text-center"
                                         style={{
@@ -168,15 +170,18 @@ export default async function DishList100Page() {
                                     >
                                         {restaurant.avg_rating.toFixed(1)}
                                     </span>
-                                    {/* Green trend indicator */}
-                                    <div
-                                        className="transform rotate-180"
-                                        style={{
-                                            width: '10px',
-                                            height: '6px',
-                                            background: '#34C759'
-                                        }}
-                                    />
+                                    {/* Trend indicator */}
+                                    {(() => {
+                                        const trend = getTrend(index)
+                                        return (
+                                            <Image
+                                                src={`/rating-indicators /trend=${trend}.svg`}
+                                                alt={`trend ${trend}`}
+                                                width={16}
+                                                height={16}
+                                            />
+                                        )
+                                    })()}
                                 </div>
                             </div>
                         </Link>

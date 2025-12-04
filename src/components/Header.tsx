@@ -14,7 +14,7 @@ export default function Header() {
     }
 
     return (
-        <header className="bg-[#1E1947] pt-12 pb-4 px-6 rounded-b-[24px] shadow-lg relative z-50">
+        <header className="bg-[#1E1947] pt-12 pb-4 px-6 shadow-lg relative z-50">
             {/* Top Row: Menu, Logo, Profile */}
             <div className="flex justify-between items-center mb-6">
                 {/* Hamburger Menu */}
