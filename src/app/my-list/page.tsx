@@ -34,7 +34,9 @@ export default async function MyList() {
             }
             if (a.userRating) return -1
             if (b.userRating) return 1
-            return a.position - b.position
+            const aPos = a.position ?? 0
+            const bPos = b.position ?? 0
+            return aPos - bPos
         })
 
     return (
