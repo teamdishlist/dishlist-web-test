@@ -138,23 +138,24 @@ export default function ExplorePage() {
                     {allCards.map((card, index) => {
                         if (card.id === 'dishlist-100' || card.id === 'my-dishlist') {
                             // Special cards with logos
+                            const specialCard = card as { id: string; name: string; href: string; background: string; textColor: string; logoImage: string; subtext?: string }
                             return (
                                 <TrackedLink
-                                    key={card.id}
-                                    href={card.href}
+                                    key={specialCard.id}
+                                    href={specialCard.href}
                                     className="rounded-2xl p-6 flex flex-col justify-center items-center active:scale-95 transition-transform relative"
                                     style={{
-                                        background: card.background,
+                                        background: specialCard.background,
                                         minHeight: '120px',
                                         filter: 'drop-shadow(0px 4px 12px rgba(191, 191, 191, 0.15))'
                                     }}
                                     fromPage="/explore"
                                 >
-                                    {card.logoImage && (
+                                    {specialCard.logoImage && (
                                         <div className="mb-2">
                                             <Image
-                                                src={card.logoImage}
-                                                alt={card.name}
+                                                src={specialCard.logoImage}
+                                                alt={specialCard.name}
                                                 width={120}
                                                 height={120}
                                                 className="object-contain"
@@ -165,11 +166,12 @@ export default function ExplorePage() {
                             )
                         } else {
                             // Category cards with background images
-                            const logoSize = logoSizeMap[card.name] || logoSizeMap['default']
+                            const categoryCard = card as { id: string; name: string; slug: string; href: string; backgroundImage: string; logoImage: string }
+                            const logoSize = logoSizeMap[categoryCard.name] || logoSizeMap['default']
                             return (
                                 <TrackedLink
-                                    key={card.id}
-                                    href={card.href}
+                                    key={categoryCard.id}
+                                    href={categoryCard.href}
                                     className="rounded-2xl overflow-hidden active:scale-95 transition-transform relative"
                                     style={{
                                         minHeight: '120px',
@@ -180,16 +182,16 @@ export default function ExplorePage() {
                                     <div className="relative w-full h-full">
                                         {/* Background Image */}
                                         <Image
-                                            src={card.backgroundImage}
-                                            alt={card.name}
+                                            src={categoryCard.backgroundImage}
+                                            alt={categoryCard.name}
                                             fill
                                             className="object-cover"
                                         />
                                         {/* Logo Overlay */}
                                         <div className="absolute inset-0 flex items-center justify-center p-4">
                                             <Image
-                                                src={card.logoImage}
-                                                alt={card.name}
+                                                src={categoryCard.logoImage}
+                                                alt={categoryCard.name}
                                                 width={logoSize.width}
                                                 height={logoSize.height}
                                                 className="object-contain"
