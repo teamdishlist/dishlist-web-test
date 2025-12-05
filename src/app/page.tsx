@@ -34,7 +34,7 @@ export default async function Home() {
     )
 
     return (
-        <div className="w-full min-h-screen relative bg-[#F6F2F1]">
+        <div className="w-full min-h-screen relative">
             {/* Background Image */}
             <div className="fixed inset-0 -z-10">
                 <Image
@@ -52,7 +52,7 @@ export default async function Home() {
 
             {/* Mobile Logo and Welcome Section */}
                 <div className="px-4 pt-6 flex flex-col items-center gap-2 md:hidden" style={{ marginBottom: '20px' }}>
-                    <Link href="/" className="relative w-[102px] h-[24px] mb-2" style={{ color: '#3F2CD1' }}>
+                    <div className="relative w-[102px] h-[24px] mb-2">
                         <Image
                             src="/type=dishlist.svg"
                             alt="dishlist"
@@ -60,11 +60,11 @@ export default async function Home() {
                             className="object-contain"
                             priority
                             style={{
-                                filter: 'brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(5000%) hue-rotate(248deg) brightness(0.88) contrast(1.15)',
-                                WebkitFilter: 'brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(5000%) hue-rotate(248deg) brightness(0.88) contrast(1.15)'
+                                filter: 'brightness(0) saturate(100%) invert(24%) sepia(95%) saturate(5000%) hue-rotate(248deg) brightness(0.9) contrast(1.2)',
+                                WebkitFilter: 'brightness(0) saturate(100%) invert(24%) sepia(95%) saturate(5000%) hue-rotate(248deg) brightness(0.9) contrast(1.2)'
                             }}
                         />
-                    </Link>
+                    </div>
                     <div className="flex justify-center items-center gap-2">
                         <span className="text-[#180400] text-base font-medium">Welcome to</span>
                         <CitySelector />
