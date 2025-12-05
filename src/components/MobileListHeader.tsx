@@ -38,7 +38,7 @@ export default function MobileListHeader({ title, backgroundImage, logoImage, sh
         <header 
             className="w-full shadow-lg relative z-50 md:hidden overflow-hidden"
             style={{ 
-                minHeight: '120px',
+                minHeight: 'auto',
                 background: backgroundImage ? 'transparent' : '#1E1947',
                 marginBottom: '0'
             }}
@@ -56,7 +56,7 @@ export default function MobileListHeader({ title, backgroundImage, logoImage, sh
                 </div>
             )}
             
-            <div className="flex items-center justify-center px-4 py-6 relative z-10">
+            <div className="flex items-center justify-center px-4 relative z-10" style={{ paddingTop: '32px', paddingBottom: '12px', minHeight: '80px' }}>
                 {/* Back Button */}
                 {shouldShowBack && (
                     <button
@@ -70,9 +70,9 @@ export default function MobileListHeader({ title, backgroundImage, logoImage, sh
                     </button>
                 )}
                 
-                {/* Logo or Title */}
+                {/* Logo or Title - Centered and aligned with back button */}
                 {logoImage ? (
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center w-full">
                         <Image
                             src={logoImage}
                             alt={title}

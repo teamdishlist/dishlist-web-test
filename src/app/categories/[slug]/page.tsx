@@ -78,7 +78,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                 logoImage={categoryLogo}
                 logoSize={
                     slug === 'guinness' ? { width: 160, height: 60 } :
-                    slug === 'fish-and-chips' ? { width: 160, height: 60 } :
+                    slug === 'fish-and-chips' ? { width: 180, height: 68 } :
                     undefined
                 }
             />

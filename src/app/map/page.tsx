@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import RestaurantMap from '@/components/RestaurantMap'
-import { getCategories, getCategoryRestaurants } from '@/lib/mock-queries'
+import RestaurantSheet from '@/components/RestaurantSheet'
+import { getCategories, getCategoryRestaurants, getRestaurant, RestaurantWithDetails } from '@/lib/mock-queries'
 import Header from '@/components/Header'
 
 export default function MapPage() {
@@ -10,6 +11,8 @@ export default function MapPage() {
     const [categories, setCategories] = useState<any[]>([])
     const [allRestaurants, setAllRestaurants] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const [selectedRestaurant, setSelectedRestaurant] = useState<RestaurantWithDetails | null>(null)
+    const [isSheetOpen, setIsSheetOpen] = useState(false)
     const headerRef = useRef<HTMLElement>(null)
     const [headerHeight, setHeaderHeight] = useState(120)
 
@@ -63,8 +66,22 @@ export default function MapPage() {
         name: r.name,
         address: r.address || undefined,
         category: r.categories?.[0]?.slug,
-        rating: r.avg_rating
+        rating: r.avg_rating,
+        restaurantId: r.id // Add restaurant ID for marker clicks
     }))
+
+    const handleMarkerClick = async (restaurantId: string) => {
+        const restaurant = await getRestaurant(restaurantId)
+        if (restaurant) {
+            setSelectedRestaurant(restaurant)
+            setIsSheetOpen(true)
+        }
+    }
+
+    const handleMapClick = () => {
+        setIsSheetOpen(false)
+        setSelectedRestaurant(null)
+    }
 
     return (
         <div className="w-full min-h-screen relative">
@@ -88,6 +105,8 @@ export default function MapPage() {
                     <RestaurantMap
                         locations={mapLocations}
                         className="w-full h-full"
+                        onMarkerClick={handleMarkerClick}
+                        onMapClick={handleMapClick}
                     />
                 </div>
             )}
@@ -97,7 +116,7 @@ export default function MapPage() {
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide px-4 max-w-md mx-auto">
                     <button
                         onClick={() => setSelectedCategory('all')}
-                        className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition shadow-lg flex-shrink-0 ${selectedCategory === 'all'
+                        className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition flex-shrink-0 ${selectedCategory === 'all'
                                 ? 'bg-[#1E1947] text-white'
                                 : 'bg-white text-gray-700 hover:bg-gray-100'
                             }`}
@@ -108,7 +127,7 @@ export default function MapPage() {
                         <button
                             key={cat.id}
                             onClick={() => setSelectedCategory(cat.slug)}
-                            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition shadow-lg flex-shrink-0 ${selectedCategory === cat.slug
+                            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition flex-shrink-0 ${selectedCategory === cat.slug
                                     ? 'bg-[#1E1947] text-white font-bold'
                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                 }`}
@@ -118,6 +137,13 @@ export default function MapPage() {
                     ))}
                 </div>
             </div>
+
+            {/* Restaurant Sheet */}
+            <RestaurantSheet
+                restaurant={selectedRestaurant}
+                isOpen={isSheetOpen}
+                onClose={handleMapClick}
+            />
         </div>
     )
 }

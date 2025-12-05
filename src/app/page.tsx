@@ -51,8 +51,8 @@ export default async function Home() {
             <div className="max-w-md mx-auto">
 
             {/* Mobile Logo and Welcome Section */}
-                <div className="px-4 pt-6 flex flex-col items-center gap-2 mb-6 md:hidden">
-                    <Link href="/" className="relative w-[102px] h-[24px] mb-2">
+                <div className="px-4 pt-6 flex flex-col items-center gap-2 md:hidden" style={{ marginBottom: '20px' }}>
+                    <Link href="/" className="relative w-[102px] h-[24px] mb-2" style={{ color: '#3F2CD1' }}>
                         <Image
                             src="/type=dishlist.svg"
                             alt="dishlist"
@@ -60,7 +60,8 @@ export default async function Home() {
                             className="object-contain"
                             priority
                             style={{
-                                filter: 'brightness(0) saturate(100%) invert(25%) sepia(95%) saturate(5000%) hue-rotate(250deg) brightness(0.9) contrast(1.2)'
+                                filter: 'brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(5000%) hue-rotate(248deg) brightness(0.88) contrast(1.15)',
+                                WebkitFilter: 'brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(5000%) hue-rotate(248deg) brightness(0.88) contrast(1.15)'
                             }}
                         />
                     </Link>
@@ -71,14 +72,14 @@ export default async function Home() {
                 </div>
 
             {/* Desktop Welcome Section */}
-                <div className="px-4 pt-6 hidden md:flex justify-center items-center gap-2 mb-6">
+                <div className="px-4 pt-6 hidden md:flex justify-center items-center gap-2" style={{ marginBottom: '20px' }}>
                     <span className="text-[#180400] text-base font-medium">Welcome to</span>
                     <CitySelector />
                 </div>
 
                 {/* My DishList Banner (Empty State) */}
                 {!hasRatings && (
-                    <div className="px-4 mb-8">
+                    <div className="px-4 mb-6">
                         <Image
                             src="/mydishlistbanner.svg"
                             alt="Start rating to build your DishList"
@@ -91,12 +92,12 @@ export default async function Home() {
                 )}
 
                 {/* Nearby Section */}
-                <div className="px-4 mb-8">
+                <div className="px-4 mb-6">
                     <h3 className="text-[16px] font-bold text-[#1E1947] mb-3">Nearby</h3>
-                    <div className="relative">
+                    <div className="relative" style={{ height: '140px' }}>
                         <RestaurantMap
                             locations={mapLocations}
-                            className="h-40 w-full"
+                            className="w-full h-full"
                             static={true}
                         />
                         <Link
@@ -115,7 +116,7 @@ export default async function Home() {
             </div>
 
                 {/* Explore Section - Break out of max-w-md container */}
-                <div className="mb-8 w-full">
+                <div className="mb-6 w-full">
                     <div className="max-w-md mx-auto px-4">
                         <h3 className="text-[16px] font-bold text-[#1E1947] mb-3">Explore</h3>
                     </div>
@@ -183,7 +184,7 @@ export default async function Home() {
 
             <div className="max-w-md mx-auto">
                 {/* Tables Section */}
-                <div className="px-4 mb-8">
+                <div className="px-4 mb-6">
                     <h3 className="text-[16px] font-bold text-[#1E1947] mb-3">Tables</h3>
 
                     {/* DishList 100 Card */}
