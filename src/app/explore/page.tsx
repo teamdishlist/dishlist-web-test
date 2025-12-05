@@ -64,7 +64,26 @@ export default function ExplorePage() {
     }
 
     // Special cards for dishlist 100 and My dishlist
-    const specialCards = [
+    type SpecialCard = {
+        id: string
+        name: string
+        subtext?: string
+        href: string
+        background: string
+        textColor: string
+        logoImage: string
+    }
+
+    type CategoryCard = {
+        id: string
+        name: string
+        slug: string
+        href: string
+        backgroundImage: string
+        logoImage: string
+    }
+
+    const specialCards: SpecialCard[] = [
         {
             id: 'dishlist-100',
             name: 'dishlist',
@@ -85,7 +104,7 @@ export default function ExplorePage() {
     ]
 
     // Category cards
-    const categoryCards = categories.map(cat => {
+    const categoryCards: CategoryCard[] = categories.map(cat => {
         const backgroundFileName = categoryBackgroundMap[cat.name] || cat.name
         const logoFileName = categoryLogoMap[cat.name] || cat.name
         const backgroundImage = `/category-backgrounds/Property 1=${backgroundFileName}.svg`
@@ -102,7 +121,7 @@ export default function ExplorePage() {
     })
 
     // Combine all cards
-    const allCards = [...specialCards, ...categoryCards]
+    const allCards: (SpecialCard | CategoryCard)[] = [...specialCards, ...categoryCards]
 
     return (
         <div className="w-full min-h-screen" style={{ background: '#F6F2F1' }}>
@@ -138,7 +157,7 @@ export default function ExplorePage() {
                     {allCards.map((card, index) => {
                         if (card.id === 'dishlist-100' || card.id === 'my-dishlist') {
                             // Special cards with logos
-                            const specialCard = card as { id: string; name: string; href: string; background: string; textColor: string; logoImage: string; subtext?: string }
+                            const specialCard = card as SpecialCard
                             return (
                                 <TrackedLink
                                     key={specialCard.id}
@@ -166,7 +185,7 @@ export default function ExplorePage() {
                             )
                         } else {
                             // Category cards with background images
-                            const categoryCard = card as { id: string; name: string; slug: string; href: string; backgroundImage: string; logoImage: string }
+                            const categoryCard = card as CategoryCard
                             const logoSize = logoSizeMap[categoryCard.name] || logoSizeMap['default']
                             return (
                                 <TrackedLink
