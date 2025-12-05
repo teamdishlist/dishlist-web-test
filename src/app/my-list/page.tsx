@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { getMyList, getRestaurant } from '@/lib/mock-queries'
 import { MOCK_USER_ID, RATINGS } from '@/lib/dummy-data'
 import Header from '@/components/Header'
+import MobileListHeader from '@/components/MobileListHeader'
 
 export default async function MyList() {
     // Get user's list
@@ -42,6 +43,10 @@ export default async function MyList() {
     return (
         <div className="w-full min-h-screen" style={{ background: '#1E1947' }}>
             <Header />
+            <MobileListHeader 
+                title="My dishlist"
+                logoImage="/food-logos/Property 1=My Dishlist.svg"
+            />
             <div className="max-w-md mx-auto">
 
             {/* Table Container */}

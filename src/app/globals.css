@@ -19,6 +19,7 @@ body {
     background: linear-gradient(to bottom,
             transparent,
             rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+    overflow-x: hidden;
 }
 
 @layer utilities {
@@ -56,5 +57,13 @@ body {
         100% {
             transform: translateX(-50%);
         }
+    }
+
+    .bottom-nav-icon-active {
+        filter: brightness(0) saturate(100%) invert(25%) sepia(95%) saturate(5000%) hue-rotate(250deg) brightness(0.9) contrast(1.2);
+    }
+
+    .bottom-nav-icon-inactive {
+        filter: brightness(0) saturate(100%);
     }
 }

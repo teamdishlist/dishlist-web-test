@@ -6,6 +6,7 @@ import { getCategories, getUserRatings, getCategoryRestaurants } from '@/lib/moc
 import { MOCK_USER_ID } from '@/lib/dummy-data'
 import CitySelector from '@/components/CitySelector'
 import Header from '@/components/Header'
+import TrackedLink from '@/components/TrackedLink'
 
 export default async function Home() {
     const categories = await getCategories()
@@ -49,8 +50,28 @@ export default async function Home() {
             
             <div className="max-w-md mx-auto">
 
-            {/* Welcome Section */}
-                <div className="px-4 pt-6 flex justify-center items-center gap-2 mb-6">
+            {/* Mobile Logo and Welcome Section */}
+                <div className="px-4 pt-6 flex flex-col items-center gap-2 mb-6 md:hidden">
+                    <Link href="/" className="relative w-[102px] h-[24px] mb-2">
+                        <Image
+                            src="/type=dishlist.svg"
+                            alt="dishlist"
+                            fill
+                            className="object-contain"
+                            priority
+                            style={{
+                                filter: 'brightness(0) saturate(100%) invert(25%) sepia(95%) saturate(5000%) hue-rotate(250deg) brightness(0.9) contrast(1.2)'
+                            }}
+                        />
+                    </Link>
+                    <div className="flex justify-center items-center gap-2">
+                        <span className="text-[#180400] text-base font-medium">Welcome to</span>
+                        <CitySelector />
+                    </div>
+                </div>
+
+            {/* Desktop Welcome Section */}
+                <div className="px-4 pt-6 hidden md:flex justify-center items-center gap-2 mb-6">
                     <span className="text-[#180400] text-base font-medium">Welcome to</span>
                     <CitySelector />
                 </div>
@@ -116,10 +137,11 @@ export default async function Home() {
                             const logoImage = `/food-logos/Property 1=${categoryFileName}.svg`
 
                             return (
-                                <Link
+                                <TrackedLink
                                     key={cat.id}
                                     href={`/categories/${cat.slug}`}
                                     className="flex flex-col items-start p-0 flex-shrink-0 active:scale-95 transition-transform"
+                                    fromPage="/"
                                     style={{
                                         width: '280px',
                                         height: '134px',
@@ -153,7 +175,7 @@ export default async function Home() {
                                             <RankingTicker restaurants={restaurants} />
                                         </div>
                                     </div>
-                                </Link>
+                                </TrackedLink>
                             )
                         })}
                     </div>

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { getCategoryRestaurants, getCityBySlug, getRestaurant } from '@/lib/mock-queries'
 import { MOCK_USER_ID } from '@/lib/dummy-data'
 import Header from '@/components/Header'
+import MobileListHeader from '@/components/MobileListHeader'
 
 // Trend function to match dishlist 100
 const getTrend = (index: number): 'up' | 'down' | 'same' => {
@@ -71,34 +72,21 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     return (
         <div className="w-full min-h-screen" style={{ background: '#1E1947' }}>
             <Header />
+            <MobileListHeader 
+                title={categoryName}
+                backgroundImage={categoryBackground}
+                logoImage={categoryLogo}
+                logoSize={
+                    slug === 'guinness' ? { width: 160, height: 60 } :
+                    slug === 'fish-and-chips' ? { width: 160, height: 60 } :
+                    undefined
+                }
+            />
             <div className="max-w-md mx-auto relative">
-                {/* Background Image - Fixed at top */}
-                <div className="absolute top-0 left-0 right-0 h-[300px] z-0">
-                    <Image
-                        src={categoryBackground}
-                        alt=""
-                        fill
-                        className="object-cover opacity-100"
-                        priority
-                    />
-                </div>
-
                 {/* Content Container */}
                 <div className="relative z-10 flex flex-col min-h-screen">
-                    {/* Category Logo Header */}
-                    <div className="flex items-center justify-center px-4 py-3 h-14 mb-8">
-                        <Image
-                            src={categoryLogo}
-                            alt={categoryName}
-                            width={120}
-                            height={40}
-                            priority
-                            className="object-contain"
-                        />
-                    </div>
-
-                {/* Table Container (The Sheet) */}
-                <div className="flex-1 overflow-hidden" style={{ background: '#FFFFFF' }}>
+                    {/* Table Container (The Sheet) */}
+                    <div className="flex-1 overflow-hidden" style={{ background: '#FFFFFF', marginTop: '0' }}>
                     {/* Table Items */}
                     <div>
                         {restaurantsWithUserRatings.length === 0 ? (

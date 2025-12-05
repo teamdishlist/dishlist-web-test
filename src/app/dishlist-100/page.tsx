@@ -3,6 +3,7 @@ import { CATEGORIES, MOCK_USER_ID } from '@/lib/dummy-data'
 import Link from 'next/link'
 import Image from 'next/image'
 import Header from '@/components/Header'
+import MobileListHeader from '@/components/MobileListHeader'
 
 export default async function DishList100Page() {
     // Fetch restaurants from all categories
@@ -39,6 +40,10 @@ export default async function DishList100Page() {
     return (
         <div className="w-full min-h-screen" style={{ background: '#1E1947' }}>
             <Header />
+            <MobileListHeader 
+                title="dishlist 100"
+                logoImage="/food-logos/Property 1=Dishlist 100.svg"
+            />
             <div className="max-w-md mx-auto">
 
             {/* Spacer for header overlap if needed, or just let it flow */}

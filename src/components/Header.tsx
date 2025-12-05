@@ -15,10 +15,10 @@ export default function Header() {
     }
 
     return (
-        <header className="bg-[#1E1947] w-full shadow-lg relative z-50">
+        <header className="bg-[#1E1947] w-full shadow-lg relative z-50 hidden md:block">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Desktop Layout */}
-                <div className="hidden md:flex items-center justify-between py-4">
+                <div className="flex items-center justify-between py-4">
                     {/* Logo */}
                     <Link href="/" className="relative w-[102px] h-[24px] flex-shrink-0">
                         <Image
