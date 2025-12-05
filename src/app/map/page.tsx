@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import RestaurantMap from '@/components/RestaurantMap'
 import { getCategories, getCategoryRestaurants } from '@/lib/mock-queries'
 import Header from '@/components/Header'
@@ -10,6 +10,8 @@ export default function MapPage() {
     const [categories, setCategories] = useState<any[]>([])
     const [allRestaurants, setAllRestaurants] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const headerRef = useRef<HTMLElement>(null)
+    const [headerHeight, setHeaderHeight] = useState(120)
 
     useEffect(() => {
         async function fetchData() {
@@ -36,6 +38,18 @@ export default function MapPage() {
         fetchData()
     }, [])
 
+    useEffect(() => {
+        const updateHeaderHeight = () => {
+            if (headerRef.current) {
+                setHeaderHeight(headerRef.current.offsetHeight)
+            }
+        }
+
+        updateHeaderHeight()
+        window.addEventListener('resize', updateHeaderHeight)
+        return () => window.removeEventListener('resize', updateHeaderHeight)
+    }, [])
+
     // Filter restaurants by category
     const filteredRestaurants = selectedCategory === 'all'
         ? allRestaurants
@@ -53,15 +67,37 @@ export default function MapPage() {
     }))
 
     return (
-        <div className="max-w-md mx-auto min-h-screen relative bg-[#F6F2F1]">
-            <Header />
+        <div className="w-full min-h-screen relative">
+            <div ref={headerRef as any} className="bg-[#1E1947]">
+                <Header />
+            </div>
 
-            {/* Category Filters */}
-            <div className="px-4 pt-4 pb-2">
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {/* Map - Full Bleed */}
+            {loading ? (
+                <div 
+                    className="absolute inset-0 w-full flex items-center justify-center bg-gray-100"
+                    style={{ top: `${headerHeight}px`, height: `calc(100vh - ${headerHeight}px)` }}
+                >
+                    <div className="text-gray-500">Loading restaurants...</div>
+                </div>
+            ) : (
+                <div 
+                    className="absolute inset-0 w-full"
+                    style={{ top: `${headerHeight}px`, height: `calc(100vh - ${headerHeight}px)` }}
+                >
+                    <RestaurantMap
+                        locations={mapLocations}
+                        className="w-full h-full"
+                    />
+                </div>
+            )}
+
+            {/* Category Filters - Overlay on top of map */}
+            <div className="fixed left-0 right-0 z-20" style={{ top: `${headerHeight + 24}px` }}>
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide px-4 max-w-md mx-auto">
                     <button
                         onClick={() => setSelectedCategory('all')}
-                        className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${selectedCategory === 'all'
+                        className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition shadow-lg flex-shrink-0 ${selectedCategory === 'all'
                                 ? 'bg-[#1E1947] text-white'
                                 : 'bg-white text-gray-700 hover:bg-gray-100'
                             }`}
@@ -72,7 +108,7 @@ export default function MapPage() {
                         <button
                             key={cat.id}
                             onClick={() => setSelectedCategory(cat.slug)}
-                            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition ${selectedCategory === cat.slug
+                            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition shadow-lg flex-shrink-0 ${selectedCategory === cat.slug
                                     ? 'bg-[#1E1947] text-white font-bold'
                                     : 'bg-white text-gray-700 hover:bg-gray-100'
                                 }`}
@@ -82,20 +118,6 @@ export default function MapPage() {
                     ))}
                 </div>
             </div>
-
-            {/* Map */}
-            {loading ? (
-                <div className="h-[calc(100vh-220px)] w-full flex items-center justify-center">
-                    <div className="text-gray-500">Loading restaurants...</div>
-                </div>
-            ) : (
-                <div className="h-[calc(100vh-220px)] w-full relative px-4">
-                    <RestaurantMap
-                        locations={mapLocations}
-                        className="w-full h-full rounded-xl"
-                    />
-                </div>
-            )}
         </div>
     )
 }

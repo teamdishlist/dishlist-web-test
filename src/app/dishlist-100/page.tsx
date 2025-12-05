@@ -37,8 +37,9 @@ export default async function DishList100Page() {
     }
 
     return (
-        <div className="max-w-md mx-auto min-h-screen" style={{ background: '#1E1947' }}>
+        <div className="w-full min-h-screen" style={{ background: '#1E1947' }}>
             <Header />
+            <div className="max-w-md mx-auto">
 
             {/* Spacer for header overlap if needed, or just let it flow */}
             {/* The header has rounded corners at the bottom, so we might need to adjust the background color of the page or the container below */}
@@ -51,10 +52,12 @@ export default async function DishList100Page() {
                         <Link
                             key={restaurant.id}
                             href={`/restaurants/${restaurant.id}`}
-                            className="flex items-center gap-2 px-4 py-2.5 transition hover:opacity-80"
+                            className="flex items-center gap-2 px-4 transition hover:opacity-80"
                             style={{
                                 background: index % 2 === 0 ? '#FFFFFF' : '#F6F2F1',
-                                height: '56px'
+                                height: '72px',
+                                paddingTop: '18px',
+                                paddingBottom: '18px'
                             }}
                         >
                             {/* Left Side - Rank & Restaurant Info */}
@@ -187,6 +190,7 @@ export default async function DishList100Page() {
                         </Link>
                     ))}
                 </div>
+            </div>
             </div>
         </div>
     )

@@ -2,6 +2,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getCategoryRestaurants, getCityBySlug, getRestaurant } from '@/lib/mock-queries'
 import { MOCK_USER_ID } from '@/lib/dummy-data'
+import Header from '@/components/Header'
+
+// Trend function to match dishlist 100
+const getTrend = (index: number): 'up' | 'down' | 'same' => {
+    const pattern = ['up', 'same', 'down', 'up', 'same', 'down', 'same', 'up']
+    return pattern[index % pattern.length] as 'up' | 'down' | 'same'
+}
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
@@ -62,45 +69,36 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     const categoryBackground = categoryBackgroundMap[slug] || '/category-backgrounds/Property 1=Burgers.svg'
 
     return (
-        <div className="relative max-w-md mx-auto min-h-screen bg-[#1E1947]">
-            {/* Background Image - Fixed at top */}
-            <div className="absolute top-0 left-0 right-0 h-[300px] z-0">
-                <Image
-                    src={categoryBackground}
-                    alt=""
-                    fill
-                    className="object-cover opacity-100"
-                    priority
-                />
-            </div>
-
-            {/* Content Container */}
-            <div className="relative z-10 flex flex-col min-h-screen">
-                {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 h-14 mb-8">
-                    <Link href="/" className="text-white hover:opacity-80 transition">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </Link>
+        <div className="w-full min-h-screen" style={{ background: '#1E1947' }}>
+            <Header />
+            <div className="max-w-md mx-auto relative">
+                {/* Background Image - Fixed at top */}
+                <div className="absolute top-0 left-0 right-0 h-[300px] z-0">
                     <Image
-                        src={categoryLogo}
-                        alt={categoryName}
-                        width={120}
-                        height={40}
+                        src={categoryBackground}
+                        alt=""
+                        fill
+                        className="object-cover opacity-100"
                         priority
-                        className="object-contain"
                     />
-                    <div className="w-6" /> {/* Spacer */}
                 </div>
 
-                {/* Table Container (The Sheet) */}
-                <div className="flex-1 rounded-t-3xl overflow-hidden bg-white">
-                    {/* Drag Handle */}
-                    <div className="flex justify-center py-2 bg-white">
-                        <div className="w-14 h-1 rounded-full bg-[#E3DAD9]"></div>
+                {/* Content Container */}
+                <div className="relative z-10 flex flex-col min-h-screen">
+                    {/* Category Logo Header */}
+                    <div className="flex items-center justify-center px-4 py-3 h-14 mb-8">
+                        <Image
+                            src={categoryLogo}
+                            alt={categoryName}
+                            width={120}
+                            height={40}
+                            priority
+                            className="object-contain"
+                        />
                     </div>
 
+                {/* Table Container (The Sheet) */}
+                <div className="flex-1 overflow-hidden" style={{ background: '#FFFFFF' }}>
                     {/* Table Items */}
                     <div>
                         {restaurantsWithUserRatings.length === 0 ? (
@@ -115,10 +113,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                                 <Link
                                     key={restaurant.id}
                                     href={`/restaurants/${restaurant.id}`}
-                                    className="flex items-center gap-2 px-4 py-2.5 transition hover:opacity-80"
+                                    className="flex items-center gap-2 px-4 transition hover:opacity-80"
                                     style={{
                                         background: index % 2 === 0 ? '#FFFFFF' : '#F6F2F1',
-                                        height: '56px'
+                                        paddingTop: '18px',
+                                        paddingBottom: '18px',
+                                        height: '72px'
                                     }}
                                 >
                                     {/* Left Side - Rank & Restaurant Info */}
@@ -214,7 +214,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                                         )}
 
                                         {/* Average Rating with Trend Indicator */}
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center gap-1.5">
                                             <span
                                                 className="font-bold text-center"
                                                 style={{
@@ -226,21 +226,25 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                                             >
                                                 {restaurant.avg_rating.toFixed(1)}
                                             </span>
-                                            {/* Green trend indicator */}
-                                            <div
-                                                className="transform rotate-180"
-                                                style={{
-                                                    width: '10px',
-                                                    height: '6px',
-                                                    background: '#34C759'
-                                                }}
-                                            />
+                                            {/* Trend indicator */}
+                                            {(() => {
+                                                const trend = getTrend(index)
+                                                return (
+                                                    <Image
+                                                        src={`/rating-indicators /trend=${trend}.svg`}
+                                                        alt={`trend ${trend}`}
+                                                        width={16}
+                                                        height={16}
+                                                    />
+                                                )
+                                            })()}
                                         </div>
                                     </div>
                                 </Link>
                             ))
                         )}
                     </div>
+                </div>
                 </div>
             </div>
         </div>

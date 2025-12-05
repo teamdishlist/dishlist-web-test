@@ -40,8 +40,9 @@ export default async function MyList() {
         })
 
     return (
-        <div className="max-w-md mx-auto min-h-screen" style={{ background: '#1E1947' }}>
+        <div className="w-full min-h-screen" style={{ background: '#1E1947' }}>
             <Header />
+            <div className="max-w-md mx-auto">
 
             {/* Table Container */}
             <div className="overflow-hidden" style={{ background: '#FFFFFF' }}>
@@ -55,10 +56,12 @@ export default async function MyList() {
                             <Link
                                 key={item.id}
                                 href={`/restaurants/${restaurant.id}`}
-                                className="flex items-center gap-2 px-4 py-2.5 transition hover:opacity-80"
+                                className="flex items-center gap-2 px-4 transition hover:opacity-80"
                                 style={{
                                     background: index % 2 === 0 ? '#FFFFFF' : '#F6F2F1',
-                                    height: '56px'
+                                    height: '72px',
+                                    paddingTop: '18px',
+                                    paddingBottom: '18px'
                                 }}
                             >
                                 {/* Left Side - Rank & Restaurant Info */}
@@ -163,6 +166,7 @@ export default async function MyList() {
                         )
                     })}
                 </div>
+            </div>
             </div>
         </div>
     )

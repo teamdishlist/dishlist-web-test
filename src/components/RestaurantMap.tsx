@@ -38,6 +38,7 @@ interface RestaurantMapProps {
     lng?: number | null
     locations?: Location[]
     className?: string
+    static?: boolean // If true, map is non-interactive (static view)
 }
 
 // Map category slugs to emoji icons
@@ -54,7 +55,7 @@ const getCategoryEmoji = (category?: string): string => {
     return emojiMap[category || ''] || '🍽️'
 }
 
-export default function RestaurantMap({ lat, lng, locations, className = "h-64 w-full" }: RestaurantMapProps) {
+export default function RestaurantMap({ lat, lng, locations, className = "h-64 w-full", static: isStatic = false }: RestaurantMapProps) {
     const router = useRouter()
     const mapContainer = useRef<HTMLDivElement>(null)
     const map = useRef<maptilersdk.Map | null>(null)
@@ -89,54 +90,85 @@ export default function RestaurantMap({ lat, lng, locations, className = "h-64 w
         // Initialize map
         maptilersdk.config.apiKey = apiKey
         // Initialize map with geolocation enabled
+        // Use MapStyle enum which automatically handles API key
         map.current = new maptilersdk.Map({
             container: mapContainer.current,
-            style: `https://api.maptiler.com/maps/019ae50c-1d54-76de-883f-791cbb44fd8b/style.json?key=${apiKey}`,
+            style: maptilersdk.MapStyle.STREETS,
             center: center,
             zoom: 13,
             navigationControl: false,
-            // Enable built‑in geolocate control
-            geolocateControl: true,
+            // Enable built‑in geolocate control only if not static
+            geolocateControl: !isStatic,
+            // Disable interactions if static
+            interactive: !isStatic,
+            dragPan: !isStatic,
+            dragRotate: !isStatic,
+            scrollZoom: !isStatic,
+            boxZoom: !isStatic,
+            doubleClickZoom: !isStatic,
+            keyboard: !isStatic,
+            touchZoomRotate: !isStatic,
+            touchPitch: !isStatic,
         })
-
-        // Track clicking to navigate to map page
-        let clickStartTime = 0
-        let clickStartPos: { x: number; y: number } | null = null
         
-        map.current.on('click', (e) => {
-            // Only navigate if it's a quick click (not a drag)
-            const clickDuration = Date.now() - clickStartTime
-            if (clickDuration < 300 && clickStartPos) {
-                const distance = Math.sqrt(
-                    Math.pow(e.point.x - clickStartPos.x, 2) + 
-                    Math.pow(e.point.y - clickStartPos.y, 2)
-                )
-                // If moved less than 5 pixels, treat as click
-                if (distance < 5) {
-                    router.push('/map')
+        // Handle style loading errors
+        map.current.on('error', (e) => {
+            console.warn('Map style loading error, this is non-fatal:', e)
+        })
+        
+        // If static, disable all interactions after map loads
+        if (isStatic) {
+            map.current.on('load', () => {
+                if (map.current) {
+                    map.current.dragPan.disable()
+                    map.current.scrollZoom.disable()
+                    map.current.boxZoom.disable()
+                    map.current.dragRotate.disable()
+                    map.current.doubleClickZoom.disable()
+                    map.current.keyboard.disable()
+                    map.current.touchZoomRotate.disable()
+                    map.current.touchPitch.disable()
                 }
-            }
-        })
-        
-        map.current.on('mousedown', (e) => {
-            clickStartTime = Date.now()
-            clickStartPos = { x: e.point.x, y: e.point.y }
-        })
-        
-        map.current.on('touchstart', (e) => {
-            clickStartTime = Date.now()
-            if (e.point) {
+            })
+        }
+
+        // Track clicking to navigate to map page (only if static)
+        if (isStatic) {
+            map.current.on('click', () => {
+                router.push('/map')
+            })
+        } else {
+            // For interactive maps, track drag vs click
+            let clickStartTime = 0
+            let clickStartPos: { x: number; y: number } | null = null
+            
+            map.current.on('click', (e) => {
+                // Only navigate if it's a quick click (not a drag)
+                const clickDuration = Date.now() - clickStartTime
+                if (clickDuration < 300 && clickStartPos) {
+                    const distance = Math.sqrt(
+                        Math.pow(e.point.x - clickStartPos.x, 2) + 
+                        Math.pow(e.point.y - clickStartPos.y, 2)
+                    )
+                    // If moved less than 5 pixels, treat as click
+                    if (distance < 5) {
+                        router.push('/map')
+                    }
+                }
+            })
+            
+            map.current.on('mousedown', (e) => {
+                clickStartTime = Date.now()
                 clickStartPos = { x: e.point.x, y: e.point.y }
-            }
-        })
-        // Add a custom GeolocateControl for better UX (shows user location & tracks)
-        const geolocate = new maptilersdk.GeolocateControl({
-            // position removed; defaults to top-right
-            showUserLocation: true,
-            trackUserLocation: true,
-            fitBoundsOptions: { maxZoom: 15 },
-        })
-        map.current.addControl(geolocate)
+            })
+            
+            map.current.on('touchstart', (e) => {
+                clickStartTime = Date.now()
+                if (e.point) {
+                    clickStartPos = { x: e.point.x, y: e.point.y }
+                }
+            })
+        }
 
         // Hide MapTiler logo
         map.current.on('load', () => {
@@ -151,26 +183,41 @@ export default function RestaurantMap({ lat, lng, locations, className = "h-64 w
             // Create custom marker element
             const markerEl = document.createElement('div')
             markerEl.className = 'custom-map-marker'
+            markerEl.style.position = 'relative'
 
             const emoji = getCategoryEmoji(location.category)
             const rating = location.rating ? location.rating.toFixed(1) : '—'
 
             markerEl.innerHTML = `
                 <div style="
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                    background: white;
-                    padding: 6px 10px;
+                    position: relative;
+                    width: 72px;
+                    height: 41.63px;
+                    background: #FFFFFF;
                     border-radius: 20px;
                     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 4px;
                     font-family: 'Sofia Sans', sans-serif;
                     font-weight: 700;
                     font-size: 16px;
-                    white-space: nowrap;
                 ">
                     <span style="font-size: 20px;">${emoji}</span>
                     <span style="color: #180400;">${rating}</span>
+                    <div style="
+                        position: absolute;
+                        bottom: -6px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        width: 0;
+                        height: 0;
+                        border-left: 6px solid transparent;
+                        border-right: 6px solid transparent;
+                        border-top: 6px solid #FFFFFF;
+                        filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.15));
+                    "></div>
                 </div>
             `
 
@@ -206,7 +253,7 @@ export default function RestaurantMap({ lat, lng, locations, className = "h-64 w
             map.current?.remove()
             map.current = null
         }
-    }, [lat, lng, locations])
+    }, [lat, lng, locations, isStatic])
 
     const apiKey = process.env.NEXT_PUBLIC_MAPTILER_API_KEY
     if (!apiKey) {
@@ -236,7 +283,9 @@ export default function RestaurantMap({ lat, lng, locations, className = "h-64 w
     return (
         <>
             <style dangerouslySetInnerHTML={{ __html: mapStyles }} />
-            <div className={`${className} rounded-xl overflow-hidden border border-gray-100 shadow-sm relative`}>
+            <div 
+                className={`${className} rounded-xl overflow-hidden border border-gray-100 shadow-sm relative ${isStatic ? 'cursor-pointer' : ''}`}
+            >
                 <div ref={mapContainer} className="w-full h-full" />
             </div>
         </>
