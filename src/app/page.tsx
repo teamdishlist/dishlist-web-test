@@ -182,12 +182,12 @@ export default async function Home() {
                 </div>
 
             <div className="max-w-md mx-auto">
-                {/* Tables Section */}
+                {/* Lists Section */}
                 <div className="px-4 mb-6">
-                    <h3 className="text-[16px] font-bold text-[#1E1947] mb-3">Tables</h3>
+                    <h3 className="text-[16px] font-bold text-[#1E1947] mb-3">Lists</h3>
 
                     {/* DishList 100 Card */}
-                    <div className="rounded-2xl overflow-hidden shadow-lg">
+                    <div className="rounded-2xl overflow-hidden shadow-lg mb-4">
                         {/* Header */}
                         <div className="bg-[#2D2654] px-4 py-3 flex items-center justify-between">
                             <Image
@@ -307,6 +307,167 @@ export default async function Home() {
                             ))}
                         </div>
                     </div>
+
+                    {/* Category Cards */}
+                    {categoryRestaurants.map(({ category, restaurants }) => {
+                        // Map category names to file names
+                        const categoryFileNameMap: Record<string, string> = {
+                            'Burgers': 'Burgers',
+                            'Pizza': 'Pizza',
+                            'Fried Chicken': 'Fried Chicken',
+                            'Kebabs': 'Kebab',
+                            'Curry': 'Curry',
+                            'Fish & Chips': 'Fish & Chips',
+                            'Guinness': 'Guinness'
+                        }
+
+                        const categoryFileName = categoryFileNameMap[category.name] || category.name
+                        const logoFileName = category.name === 'Fried Chicken' ? 'Fried Chicken (Long)' : categoryFileName
+                        const logoImage = `/food-logos/Property 1=${logoFileName}.svg`
+                        const backgroundImage = `/category-backgrounds/Property 1=${categoryFileName}.svg`
+
+                        // Get category emoji
+                        const categoryEmoji = category.slug === 'pizza' ? '🍕' :
+                            category.slug === 'burgers' ? '🍔' :
+                                category.slug === 'fried-chicken' ? '🍗' :
+                                    category.slug === 'kebabs' ? '🥙' :
+                                        category.slug === 'curry' ? '🍛' :
+                                            category.slug === 'fish-and-chips' ? '🐟' :
+                                                category.slug === 'guinness' ? '🍺' : '🍽️'
+
+                        return (
+                            <div key={category.id} className="rounded-2xl overflow-hidden shadow-lg mb-4">
+                                {/* Header */}
+                                <div 
+                                    className="px-4 py-3 flex items-center justify-between relative"
+                                >
+                                    {/* Background Image */}
+                                    <div className="absolute inset-0">
+                                        <Image
+                                            src={backgroundImage}
+                                            alt={category.name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                    
+                                    {/* Content */}
+                                    <div className="relative z-10 flex items-center gap-2">
+                                        <Image
+                                            src={logoImage}
+                                            alt={category.name}
+                                            width={category.name === 'Guinness' ? 60 : 80}
+                                            height={category.name === 'Guinness' ? 18 : 24}
+                                            className="w-auto"
+                                            style={{ height: category.name === 'Guinness' ? '18px' : '24px' }}
+                                        />
+                                    </div>
+                                    <Link
+                                        href={`/categories/${category.slug}`}
+                                        className="relative z-10 bg-white/10 w-10 h-10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition active:scale-95"
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M15 3L21 3L21 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M9 21L3 21L3 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M21 3L14 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M3 21L10 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </Link>
+                                </div>
+
+                                {/* Top 3 Restaurants */}
+                                <div className="bg-white">
+                                    {restaurants.slice(0, 3).map((restaurant, index) => (
+                                        <Link
+                                            key={restaurant.id}
+                                            href={`/categories/${category.slug}`}
+                                            className="flex items-center gap-2 px-4 py-2.5 transition hover:opacity-80"
+                                            style={{
+                                                background: index % 2 === 0 ? '#FFFFFF' : '#F6F2F1',
+                                                height: '56px'
+                                            }}
+                                        >
+                                            {/* Left Side - Rank & Restaurant Info */}
+                                            <div className="flex items-center gap-2 flex-1">
+                                                {/* Rank & Category Emoji */}
+                                                <div className="flex items-center gap-2">
+                                                    <span
+                                                        className="font-bold flex items-center"
+                                                        style={{
+                                                            fontFamily: 'Sofia Sans, sans-serif',
+                                                            fontSize: '16px',
+                                                            lineHeight: '19px',
+                                                            color: '#180400',
+                                                            width: '20px'
+                                                        }}
+                                                    >
+                                                        {index + 1}
+                                                    </span>
+                                                    <span className="text-2xl">
+                                                        {categoryEmoji}
+                                                    </span>
+                                                </div>
+
+                                                {/* Restaurant Name & Location */}
+                                                <div className="flex flex-col justify-center gap-1 flex-1">
+                                                    <span
+                                                        className="font-bold flex items-center"
+                                                        style={{
+                                                            fontFamily: 'Sofia Sans, sans-serif',
+                                                            fontSize: '16px',
+                                                            lineHeight: '19px',
+                                                            color: '#180400'
+                                                        }}
+                                                    >
+                                                        {restaurant.name}
+                                                    </span>
+                                                    <div className="flex items-center gap-1">
+                                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M6 0C7.32608 0 8.59747 0.527162 9.53516 1.46484C10.4728 2.40253 11 3.67392 11 5C11 6.95085 9.75812 8.69776 8.61328 9.90625C8.03061 10.5213 7.44939 11.022 7.01465 11.3682C6.79706 11.5414 6.6149 11.6767 6.48633 11.7695C6.42199 11.816 6.37047 11.8524 6.33496 11.877C6.31739 11.8891 6.30361 11.8987 6.29395 11.9053L6.2793 11.915L6.27832 11.916H6.27734C6.1305 12.0139 5.9447 12.0264 5.78809 11.9531L5.72266 11.916L5.7207 11.915L5.70605 11.9053C5.69639 11.8987 5.68261 11.8891 5.66504 11.877C5.62953 11.8524 5.57801 11.816 5.51367 11.7695C5.3851 11.6767 5.20294 11.5414 4.98535 11.3682C4.55061 11.022 3.96939 10.5213 3.38672 9.90625C2.24188 8.69776 1 6.95085 1 5C1 3.67392 1.52716 2.40253 2.46484 1.46484C3.40253 0.527162 4.67392 0 6 0ZM6 3.5C5.17157 3.5 4.5 4.17157 4.5 5C4.5 5.82843 5.17157 6.5 6 6.5C6.82843 6.5 7.5 5.82843 7.5 5C7.5 4.17157 6.82843 3.5 6 3.5Z" fill="#FF2D55" />
+                                                        </svg>
+                                                        <span
+                                                            className="flex items-center"
+                                                            style={{
+                                                                fontFamily: 'Sofia Sans, sans-serif',
+                                                                fontSize: '14px',
+                                                                lineHeight: '17px',
+                                                                color: '#3D0900'
+                                                            }}
+                                                        >
+                                                            {restaurant.locations && restaurant.locations.length > 1
+                                                                ? 'Multiple locations'
+                                                                : restaurant.neighbourhood}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Right Side - Rating & Trend */}
+                                            <div className="flex items-center gap-1.5">
+                                                <span
+                                                    className="font-bold text-center"
+                                                    style={{
+                                                        fontFamily: 'Sofia Sans, sans-serif',
+                                                        fontSize: '16px',
+                                                        lineHeight: '19px',
+                                                        color: '#180400'
+                                                    }}
+                                                >
+                                                    {restaurant.avg_rating.toFixed(1)}
+                                                </span>
+                                                <Image
+                                                    src="/rating-indicators /trend=up.svg"
+                                                    alt="trending up"
+                                                    width={16}
+                                                    height={16}
+                                                />
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
         </div>
