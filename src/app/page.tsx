@@ -134,7 +134,8 @@ export default async function Home() {
 
                             const categoryFileName = categoryFileNameMap[cat.name] || cat.name
                             const backgroundImage = `/category-backgrounds/Property 1=${categoryFileName}.svg`
-                            const logoImage = `/food-logos/Property 1=${categoryFileName}.svg`
+                            const logoFileName = cat.name === 'Fish & Chips' ? 'Fish & Chips (Stack)' : categoryFileName
+                            const logoImage = `/food-logos/Property 1=${logoFileName}.svg`
 
                             return (
                                 <TrackedLink
@@ -164,8 +165,8 @@ export default async function Home() {
                                             <Image
                                                 src={logoImage}
                                                 alt={cat.name}
-                                                width={120}
-                                                height={120}
+                                                width={cat.name === 'Fish & Chips' ? 100 : cat.name === 'Guinness' ? 130 : 120}
+                                                height={cat.name === 'Fish & Chips' ? 100 : cat.name === 'Guinness' ? 130 : 120}
                                                 className="object-contain"
                                             />
                                         </div>
@@ -356,15 +357,15 @@ export default async function Home() {
                                         <Image
                                             src={logoImage}
                                             alt={category.name}
-                                            width={category.name === 'Guinness' ? 60 : 80}
-                                            height={category.name === 'Guinness' ? 18 : 24}
+                                            width={category.name === 'Guinness' ? 60 : category.name === 'Burgers' ? 100 : 80}
+                                            height={category.name === 'Guinness' ? 18 : category.name === 'Burgers' ? 30 : 24}
                                             className="w-auto"
-                                            style={{ height: category.name === 'Guinness' ? '18px' : '24px' }}
+                                            style={{ height: category.name === 'Guinness' ? '18px' : category.name === 'Burgers' ? '30px' : '24px' }}
                                         />
                                     </div>
                                     <Link
                                         href={`/categories/${category.slug}`}
-                                        className="relative z-10 bg-white/10 w-10 h-10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition active:scale-95"
+                                        className={`relative z-10 w-10 h-10 rounded-xl flex items-center justify-center text-white transition active:scale-95 ${category.name === 'Fish & Chips' ? 'bg-black/5 hover:bg-black/10' : 'bg-white/10 hover:bg-white/20'}`}
                                     >
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M15 3L21 3L21 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

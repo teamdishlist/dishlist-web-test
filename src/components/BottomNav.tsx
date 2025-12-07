@@ -16,10 +16,10 @@ export default function BottomNav() {
 
     const navItems = [
         {
-            href: '/explore',
+            href: '/',
             label: 'Explore',
             icon: '/bottom-nav/explore.svg',
-            active: isActive('/explore')
+            active: isActive('/')
         },
         {
             href: '/map',
@@ -34,10 +34,10 @@ export default function BottomNav() {
             active: isActive('/dishlist-100')
         },
         {
-            href: '/',
+            href: '/explore',
             label: 'Lists',
             icon: '/bottom-nav/list.svg',
-            active: isActive('/')
+            active: isActive('/explore')
         },
         {
             href: '/my-list',
@@ -123,7 +123,7 @@ export default function BottomNav() {
                                         position: 'relative'
                                     }}
                                 >
-                                    {isItemActive && item.href === '/explore' ? (
+                                    {isItemActive && item.href === '/' ? (
                                         // Explore icon is already purple when active
                                         <Image
                                             src={item.icon}
