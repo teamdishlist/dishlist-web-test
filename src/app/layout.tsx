@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Sofia_Sans } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@fontsource/stack-sans-notch/700.css";
 import "./globals.css";
 import { CityProvider } from "@/contexts/CityContext";
@@ -30,6 +31,7 @@ export default function RootLayout({
                     </main>
                     <BottomNav />
                 </CityProvider>
+                <SpeedInsights />
             </body>
         </html>
     );
